@@ -1,0 +1,175 @@
+*{ margin: 0px; padding: 0px; box-sizing: border-box; }
+body { font-family: 'Montserrat', sans-serif; }
+/* img{display: block;} */
+
+header {
+    position: fixed;
+    width: 100%;
+    height: 50px;
+    border-bottom: 1px solid #6e6e6e5b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    z-index: 10;
+    background-color: #fff;
+}
+
+.logo {
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.constainer{
+    display: flex;
+}
+
+/* .queuePanel, .main {
+    height: calc(100vh - 121px);
+    overflow-y: auto;
+} */
+.queuePanel{
+    position: fixed;
+    top: 50px;
+    left: 0;
+    width: 71px;
+    height: calc(100vh - 121px);
+    background-color: #fff;
+    padding: 15px 8px 8px;
+    box-shadow: 1px 0px 8px 1px rgba(0, 0, 0, 0.22);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.queuePanel .queueTitle {
+    font-weight: 500;
+    padding: 0px 0px 15px;
+}
+
+.queueList li {
+    padding-bottom: 8px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 71px;
+    border-top: 1px solid #6e6e6e5b;
+    display: flex;
+    justify-content: space-between;
+    z-index: 10;
+    background-color: #fff;
+    padding: 0 20px 0 8px;
+}
+
+footer .currMusic {
+    display: flex;
+    align-items: center;
+    border-right: 1px solid #6e6e6e5b;
+    padding-right: 20px;
+}
+footer .currMusic img {
+    /* width: 45px; */
+    margin-right: 10px;
+}
+
+footer .musicState {
+    display: flex;
+    padding: 0px 15px;
+    align-items: center;
+}
+footer .musicState .material-icons{
+    font-size: 30px;
+}
+
+footer .extraFeature .material-icons{
+    margin-left: 15px;
+}
+
+footer .extraFeature {
+    flex-grow: 1;
+    text-align: right;
+    align-items: center;
+    display: flex;
+    justify-content: flex-end;
+}
+footer .timeEvent{
+    padding-left: 15px;;
+}
+
+/* main body */
+.main {
+    padding: 65px 20px 71px 110px;
+}
+
+.listGroup{
+    margin-bottom: 20px;
+}
+
+.listGroup .title{
+    font-weight: 500;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #6e6e6e5b;
+}
+
+.listGroup .listGrid{
+    list-style-type: none;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.listGroup .listItem{
+    padding: 20px 20px 20px 0px;
+}
+
+a{
+    text-decoration: none;
+    color: #000;
+}
+
+.listGroup .albumName {
+    padding-top: 5px;
+    font-size: 15px;
+}
+
+/* audio track */
+.audioTrackWrap {
+    width: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 10px;
+    cursor: pointer;
+}
+.audioTrack {
+    width: 100%;
+    height: 4px;
+    background: #c4c4c4;
+}
+
+.audioTrack .currentPoint{
+    background: #ff0000;
+    width: 50%;
+    height: 100%;
+    position: relative;
+}
+
+.audioTrack .currentPoint .dragable{
+    position: absolute;
+    right: -6px;
+    top: -6px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    z-index: 11;
+    background: #ff0000;
+    box-shadow: inset 3px -2px 7px 0px #ffffffb5;
+    border: 1px solid #ffffffa6;
+    visibility: hidden;
+}
+
+.audioTrackWrap:hover .currentPoint .dragable{
+    visibility: visible;
+}
