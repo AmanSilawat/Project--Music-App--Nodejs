@@ -49,6 +49,9 @@ header {
 .queueList li {
     padding-bottom: 8px;
 }
+.queueList li img, .currMusic img{
+    width: 55px;
+}
 
 footer {
     position: fixed;
@@ -122,6 +125,10 @@ footer .timeEvent{
 
 .listGroup .listItem{
     padding: 20px 20px 20px 0px;
+}
+
+.listGroup .listItem img {
+    width: 220px;
 }
 
 a{
