@@ -164,7 +164,7 @@ a{
     position: relative;
 }
 
-.audioTrack .currentPoint .dragable{
+.audioTrack .currentPoint .draggable{
     position: absolute;
     right: -6px;
     top: -6px;
@@ -178,6 +178,6 @@ a{
     visibility: hidden;
 }
 
-.audioTrackWrap:hover .currentPoint .dragable{
+.audioTrackWrap:hover .currentPoint .draggable{
     visibility: visible;
 }
