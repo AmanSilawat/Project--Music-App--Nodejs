@@ -1,20 +1,29 @@
 class MusicApp {
-    constructor(musicIdentity, aud) {
+    /**
+     * 
+     * @param {*} musicIdentity 
+     */
+    constructor() {
         this.audio = new Audio();
         this.audioDuration = null;
-        this.audioInterval = null;
-        this.audioTrackWrap = document.querySelector('.audioTrackWrap');
-        this.audioBarMain = document.querySelector('.audioTrack');
+        this.audioInterval = null; // assigin music progress bar setInterval
         this.dragStart = false;
-        this.audioBar = document.querySelector('.currentPoint');
         this.el = {
             playPauseBtn: document.getElementById('playPauseBtn'),
-            mNodeEleList: document.querySelectorAll(musicIdentity),
-            musicBar: document.getElementById('musicBar'),
-            totTimeState: document.getElementById('totTimeState'),
-            currTimeState: document.getElementById('currTimeState'),
             muteBtn: document.getElementById('muteBtn'),
             loopBtn: document.getElementById('loopBtn'),
+            queuePanel: document.querySelector('.queuePanel'),
+            totTimeState: document.getElementById('totTimeState'),
+            audioTrackWrap: document.querySelector('.audioTrackWrap'),
+            audioBar: document.querySelector('.currentPoint'),
+            audioBarMain: document.querySelector('.audioTrack'),
+            mNodeEleList: document.querySelectorAll('a[data-audioName]'),
+            musicBar: document.getElementById('musicBar'),
+            currTimeState: document.getElementById('currTimeState'),
+            musicTitile: document.getElementById('musicTitile'),
+            musicThumbnil: document.getElementById('musicThumbnil'),
+            playerPanel: document.querySelector('footer'),
+            imgEff: document.getElementById('playerEff')
         }
 
         // Listen Event on all music
@@ -32,13 +41,11 @@ class MusicApp {
         this.el.loopBtn.addEventListener('click', this.audioLoop.bind(this));
 
         // Listen Event on click to drage audio track
-        this.audioTrackWrap.addEventListener('click', function(e) {
-            console.log(e.x);
+        this.el.audioTrackWrap.addEventListener('click', function (e) {
             this.seekingAudio(e.x, 'drop');
         }.bind(this));
 
-        this.audioBarMainWidth = window.getComputedStyle(this.audioBarMain).getPropertyValue('width').slice(0, -2);
-        console.log(this.audioBarMainWidth);
+        this.audioBarMainWidth = window.getComputedStyle(this.el.audioBarMain).getPropertyValue('width').slice(0, -2);
         this.deagNDrop();
     }
 
@@ -46,9 +53,17 @@ class MusicApp {
         let musicName;
         if ((e.path[0].tagName).toLowerCase() == 'a') {
             musicName = e.path[0].dataset.audioname;
+            this.audio.title = e.path[0].querySelector('.albumName').textContent;
+            this.audio.textContent = e.path[0].querySelector('.albumName').textContent;
+            this.audio.textContent = e.path[0].querySelector('img').src;
+
         }
         else if ((e.path[1].tagName).toLowerCase() == 'a') {
             musicName = e.path[1].dataset.audioname;
+            this.audio.title = e.path[1].querySelector('.albumName').textContent;
+            this.audio.textContent = e.path[1].querySelector('.albumName').textContent;
+            this.audio.textContent = e.path[1].querySelector('img').src;
+
         }
 
         this.audio.src = `./assets/musics/${musicName}.mp3`;
@@ -86,6 +101,27 @@ class MusicApp {
         }
     }
 
+    musicStateChange() {
+        this.audio.play().then(() => {
+            this.audioDuration = this.audio.duration;
+
+            // set time and progress bar
+            this.musicProgress();
+            this.audioInterval = setInterval(this.musicProgress.bind(this), 1000);
+
+            // chnage current player thamblin and titile
+            this.el.musicTitile.textContent = this.audio.title;
+            this.el.musicThumbnil.src = this.audio.textContent;
+
+            // activePlayer
+            this.el.playerPanel.classList.add('activePlayer');
+            this.el.queuePanel.classList.add('activePlayer');
+
+            this.el.imgEff.classList.add('activePlayer');
+            this.el.imgEff.style.backgroundImage = `url(${this.audio.textContent})`;
+        });
+    }
+
     musicProgress() {
         // total time calcualtion
         let totDuration = parseInt(this.audioDuration)
@@ -106,20 +142,11 @@ class MusicApp {
             let currDuaInPercentage = currDuration / (totDuration) * 100;
             this.el.musicBar.style.width = `${currDuaInPercentage}%`;
 
-            // stop
+            // stop audio time traking
             if (this.audio.loop == false && currDuaInPercentage >= 100) {
                 clearInterval(this.audioInterval);
             }
         }
-
-    }
-
-    musicStateChange() {
-        this.audio.play();
-        this.audioInterval = setInterval(this.musicProgress.bind(this), 1000);
-
-        // not woking perfect with syncronization
-        setTimeout(() => this.audioDuration = this.audio.duration, 100);
     }
 
     changeAudioInfo() {
@@ -131,7 +158,7 @@ class MusicApp {
     // drag and drop function
     deagNDrop() {
         // let ele = this.el.musicBar.querySelector('.draggable');
-        let ele = this.audioTrackWrap;
+        let ele = this.el.audioTrackWrap;
         ele.addEventListener('dragstart', function (event) {
             event.dataTransfer.setData("idName", event.target.id);
             this.dragStart = true;
@@ -167,16 +194,15 @@ class MusicApp {
         switch (type) {
             case 'drop':
                 getPer = (xPos / this.audioBarMainWidth) * 100;
-                console.log(getPer, this.audioDuration , (getPer / 100));
                 this.audio.currentTime = this.audioDuration * (getPer / 100);
-                musicProgress();
+                this.musicProgress();
                 break;
 
             case 'drag':
                 getPer = (xPos / this.audioBarMainWidth) * 100;
-                this.audioBar.style.width = `${getPer}%`;
+                this.el.audioBar.style.width = `${getPer}%`;
                 break;
-        
+
             default:
                 console.log('Somting went worng');
                 break;
@@ -184,4 +210,4 @@ class MusicApp {
     }
 }
 
-let music = new MusicApp('a[data-audioName]');
+let music = new MusicApp();

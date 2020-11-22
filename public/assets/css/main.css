@@ -33,12 +33,18 @@ header {
     top: 50px;
     left: 0;
     width: 71px;
-    height: calc(100vh - 121px);
+    height: calc(100vh - 50px);
     background-color: #fff;
     padding: 15px 8px 8px;
     box-shadow: 1px 0px 8px 1px rgba(0, 0, 0, 0.22);
     overflow-y: auto;
     overflow-x: hidden;
+    transition: all .3s ease-in;
+    z-index: 9;
+}
+
+.queuePanel.activePlayer{
+    height: calc(100vh - 121px);
 }
 
 .queuePanel .queueTitle {
@@ -55,7 +61,7 @@ header {
 
 footer {
     position: fixed;
-    bottom: 0;
+    bottom: -71px;
     left: 0;
     width: 100%;
     height: 71px;
@@ -65,6 +71,11 @@ footer {
     z-index: 10;
     background-color: #fff;
     padding: 0 20px 0 8px;
+    transition: all .3s ease-in;
+}
+
+footer.activePlayer {
+    bottom: 0px;
 }
 
 footer .currMusic {
@@ -72,10 +83,16 @@ footer .currMusic {
     align-items: center;
     border-right: 1px solid #6e6e6e5b;
     padding-right: 20px;
+    width: 300px;
 }
 footer .currMusic img {
-    /* width: 45px; */
     margin-right: 10px;
+}
+
+footer .currMusic #musicTitile {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 footer .musicState {
@@ -105,6 +122,32 @@ footer .timeEvent{
 /* main body */
 .main {
     padding: 65px 20px 71px 110px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+#playerEff{
+    position: absolute;
+    top: 0px;
+    left: 0;
+    width: 100%;
+    height: 34%;
+    z-index: -1;
+    background-size: 100% 90%;
+    background-repeat: no-repeat;
+    box-shadow: inset 0 -20px 188px 71px rgb(255 255 255);
+}
+
+.main:after{
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-color: rgb(239 239 239 / 73%);
+    backdrop-filter: blur(45px);
 }
 
 .listGroup{
@@ -127,8 +170,12 @@ footer .timeEvent{
     padding: 20px 20px 20px 0px;
 }
 
-.listGroup .listItem img {
+.listGroup .listItem a{
     width: 220px;
+}
+
+.listGroup .listItem img {
+    width: 100%;
 }
 
 a{
@@ -140,6 +187,9 @@ a{
 .listGroup .albumName {
     padding-top: 5px;
     font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* audio track */

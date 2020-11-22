@@ -6,6 +6,7 @@
     <title>Sanjeet App</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="icon" type="image/png" sizes="128x128" href="./assets/images/music.png" />
     <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -21,7 +22,8 @@
                 <li><a href="javascript:void(0)" ><img src="./assets/images/atif-aslam.jpg" alt="thumbnil" /></a></li>
             </ul>
         </div>
-        <div class="main">
+        <div class="main activePlayer">
+            <div id="playerEff"></div>
             <!-- Artists Group -->
             <div class="listGroup">
                 <div class="title">Aarzoo-E-Rehmat Album</div>
@@ -128,8 +130,8 @@
             </div>
         </div>
         <div class="currMusic">
-            <img src="./assets/images/atif-aslam.jpg" alt="img" />
-            <span>Song Name</span>
+            <img id="musicThumbnil" src="./assets/images/atif-aslam.jpg" alt="img" />
+            <span id="musicTitile">Song Name</span>
         </div>
         <div class="musicState">
             <div id="musicEvent">
