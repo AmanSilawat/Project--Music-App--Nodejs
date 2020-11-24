@@ -1,10 +1,10 @@
 {
   "name": "music-app",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
@@ -20,9 +20,20 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.0.0",
-    "prettier": "^2.1.2"
+    "prettier": "^2.2.0"
   },
   "dependencies": {
-    "express": "^4.17.1"
-  }
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "pug": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AmanSilawat/Project--Music-App--JavaScript.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AmanSilawat/Project--Music-App--JavaScript/issues"
+  },
+  "homepage": "https://github.com/AmanSilawat/Project--Music-App--JavaScript#readme",
+  "description": ""
 }
