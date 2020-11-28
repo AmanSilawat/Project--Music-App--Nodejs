@@ -23,6 +23,7 @@
     "prettier": "^2.2.0"
   },
   "dependencies": {
+    "child_process": "^1.0.2",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "pug": "^3.0.0"

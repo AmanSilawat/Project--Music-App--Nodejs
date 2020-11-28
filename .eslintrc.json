@@ -15,6 +15,7 @@
         ],
         "semi": "error",
         "no-console": "warn",
-        "prefer-const": "warn"
+        "prefer-const": "warn",
+        "no-unused-vars":"warn"
     }
 }

@@ -1,0 +1,79 @@
+const path = require('path');
+const fs = require('fs');
+
+// __dirname, process.cwd() ::: get app directory
+let audioSrc = path.join(__dirname, '/public/assets/data');
+
+let musicDir = {};
+
+fs.readdir(audioSrc, (err, mainDir) => {
+    for (const innerOne of mainDir) {
+        const newSrc = path.join(audioSrc, `/${innerOne}`);
+        fs.readdir(newSrc, (_err, innerTwo) => {
+            // console.log(innerOne, innerTwo);
+            musicDir[innerOne] = innerTwo;
+            console.log(musicDir);
+        });
+    }
+});
+
+
+
+// !Blue Print 1
+const data = [
+    {
+        title: "album",
+        type: 'playlist',
+        data: {
+            playlist0: 'aarzooERehmat',
+            playlist1: 'alNabi',
+        },
+        list: [
+            {
+                title: "album",
+                type: 'playlist',
+                data: {
+                    playlist0: 'aarzooERehmat',
+                    playlist1: 'alNabi',
+                },
+            }
+        ]
+    },
+    {
+        title: "mod",
+        type: 'playlist',
+        data: {
+            naatSarif: ['fileName1', 'fileName2'],
+            qawwalies: {
+                playlist2: 'bestQawwalies',
+                playlist3: 'sufiQawwalies',
+            },
+        },
+    },
+    {
+        title: "singer",
+        type: 'playlist',
+        data: {
+            playlist4: 'atif',
+            playlist4: 'hafizAhamedRazaQadri',
+            playlist5: 'owieshRazaQadri',
+        },
+    },
+    {
+        title: "top10",
+        type: 'tracklist',
+        data: {
+            trackList1: 'fileName.mp3',
+            trackList2: 'fileName.mp3',
+            trackList3: 'fileName.mp3',
+        },
+    },
+];
+
+//! Blue Print 2
+// const dataHomePage = {
+//     album: ['aarzooERehmat', 'alNabi'],
+//     mod: ['naatSarif', 'qawwalies'],
+//     singer: ['atif', 'hafizAhamedRazaQadri', 'owieshRazaQadri'],
+//     top10: ['fileName1', 'fileName2'],
+// };
