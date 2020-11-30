@@ -1,5 +1,6 @@
 class MusicApp {
-    constructor() {
+    constructor(musicAppView) {
+        this.musicAppView = musicAppView;
         this.audio = new Audio();
         this.audioDuration = null;
         this.audioInterval = null; // assigin music progress bar setInterval
@@ -19,7 +20,8 @@ class MusicApp {
             musicTitile: document.getElementById('musicTitile'),
             musicThumbnil: document.getElementById('musicThumbnil'),
             playerPanel: document.querySelector('footer'),
-            imgEff: document.getElementById('playerEff')
+            imgEff: document.getElementById('playerEff'),
+            listAnchor: document.querySelectorAll('a[data-img]')
         }
 
         // Listen Event on all music
@@ -43,6 +45,35 @@ class MusicApp {
 
         this.audioBarMainWidth = window.getComputedStyle(this.el.audioBarMain).getPropertyValue('width').slice(0, -2);
         this.deagNDrop();
+
+        // inner page
+        for (const anchor of this.el.listAnchor) {
+            anchor.addEventListener('click', this.hasChange.bind(this));
+        }
+    }
+
+    hasChange(e) {
+        e.preventDefault();
+        const dataset = e.target.dataset.img.split('/').map((el) => el.replace(/ /g, '-'));
+        let musicTree = this.musicAppView.musicDir;
+
+        let i = 0;
+        let popedVal = dataset.shift();
+        while (musicTree.length > i) {
+            let trimed = musicTree[i].name.replace(/ /g, '-');
+
+            if (trimed == popedVal) {
+                if (dataset.length == 0) {
+                    musicTree = musicTree[i];
+                    break;
+                }
+                musicTree = musicTree[i].children;
+                popedVal = dataset.shift() || false;
+                i = 0;
+                continue;
+            }
+            i++;
+        }
     }
 
     getSong(e) {

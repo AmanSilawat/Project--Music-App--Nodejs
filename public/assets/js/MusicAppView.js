@@ -24,12 +24,14 @@ class MusicAppView {
         this.el.songImg.alt = 'img';
         this.el.albumName.classList.add('albumName');
 
+        // extra variable
         this.trackData = null;
+        this.musicDir = musicDir;
 
         // call function according to type
         switch (pageType) {
             case 'home_page':
-                for (const item of musicDir) {
+                for (const item of this.musicDir) {
                     let x = this.setDesignView(item.name, item.type, item.children);
                     this.el.container.appendChild(x)
                 }
@@ -97,12 +99,16 @@ class MusicAppView {
         const imgWrap = this.el.imgWrap.cloneNode(true);
         const songImg = this.el.songImg.cloneNode(true);
         const albumName = this.el.albumName.cloneNode(true);
-
+        
         const noSpaceImgName = gridItem.name.replace(/ /g, '-');
-
+        
         // access clone node
-        listAnchor.href = `${heading}/${noSpaceImgName}`;
-        songImg.setAttribute('data-img', noSpaceImgName);
+        // listAnchor.href = `javascript:void(0)`;
+        listAnchor.href = `https://www.w3schools.com/jsref/met_console_time.asp`;
+        listAnchor.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
+        songImg.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
+        albumName.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
+        imgWrap.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
         albumName.textContent = gridItem.name;
 
         // append all nodes
@@ -152,7 +158,8 @@ class MusicAppView {
                 break;
 
             case 'track':
-        
+
+                // console.log(this.trackData);
                 if (this.trackData == null) {
                     var get_jsonData = fetch(`./assets/data/${heading}/info.json`);
                     get_jsonData.then((res=> {
