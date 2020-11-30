@@ -104,7 +104,7 @@ class MusicAppView {
         
         // access clone node
         // listAnchor.href = `javascript:void(0)`;
-        listAnchor.href = `https://www.w3schools.com/jsref/met_console_time.asp`;
+        listAnchor.href = `${heading}/${noSpaceImgName}`;
         listAnchor.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
         songImg.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
         albumName.setAttribute('data-img', `${heading}/${noSpaceImgName}`);

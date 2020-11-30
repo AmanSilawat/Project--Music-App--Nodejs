@@ -53,7 +53,6 @@ class MusicApp {
     }
 
     hasChange(e) {
-        e.preventDefault();
         const dataset = e.target.dataset.img.split('/').map((el) => el.replace(/ /g, '-'));
         let musicTree = this.musicAppView.musicDir;
 
