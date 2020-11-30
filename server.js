@@ -9,7 +9,7 @@ const app = express();
 app.set('view engine', 'ejs');
 app.use(express.static('./public'));
 
-async function getDirData(res) {
+async function getDirData() {
     // get list of songs using shell command
     const { stdout } = await exec(
         "find ./public/assets/data -iname '*.mp3' -print"
@@ -25,7 +25,7 @@ async function getDirData(res) {
 
     const treeData = {};
     treeData['RootNode'] = new MusicNode('RootNode', 'RootNode');
-    
+
     function recursion(data, MusicNode, treeData, previousNode = 'RootNode') {
         if (data.length == 0) {
             return treeData['RootNode'];
@@ -47,11 +47,9 @@ async function getDirData(res) {
             // reassign
             previousNode = firstVal;
             data.push(lastRow);
-
         } else {
             try {
                 treeData[previousNode].children[0].tracks.push(firstVal);
-
             } catch (error) {
                 treeData[firstVal] = new MusicNode(firstVal, 'track');
                 treeData[previousNode].children.push(treeData[firstVal]);
@@ -64,8 +62,8 @@ async function getDirData(res) {
         return recursion(data, MusicNode, treeData, previousNode);
     }
 
-    const musicTreeObje = recursion(pathListArr, MusicNode, treeData);
-    res.send(musicTreeObje.children);
+    const ressult = recursion(pathListArr, MusicNode, treeData);
+    return ressult;
 }
 
 app.get('/', function setRootDir(req, res) {
@@ -73,7 +71,7 @@ app.get('/', function setRootDir(req, res) {
 });
 
 app.get('/getData', function getDa(req, res) {
-    getDirData(res);
+    getDirData(res).then((response) => res.send(response.children));
 });
 
 app.listen(8080);

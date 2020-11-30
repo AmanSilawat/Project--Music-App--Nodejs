@@ -1,8 +1,4 @@
 class MusicApp {
-    /**
-     * 
-     * @param {*} musicIdentity 
-     */
     constructor() {
         this.audio = new Audio();
         this.audioDuration = null;
@@ -17,7 +13,7 @@ class MusicApp {
             audioTrackWrap: document.querySelector('.audioTrackWrap'),
             audioBar: document.querySelector('.currentPoint'),
             audioBarMain: document.querySelector('.audioTrack'),
-            mNodeEleList: document.querySelectorAll('a[data-audioName]'),
+            musicRowNode: document.querySelectorAll('.listGrid'),
             musicBar: document.getElementById('musicBar'),
             currTimeState: document.getElementById('currTimeState'),
             musicTitile: document.getElementById('musicTitile'),
@@ -27,7 +23,7 @@ class MusicApp {
         }
 
         // Listen Event on all music
-        for (const m of this.el.mNodeEleList) {
+        for (const m of this.el.musicRowNode) {
             m.addEventListener('click', this.getSong.bind(this), true);
         }
 
@@ -50,34 +46,21 @@ class MusicApp {
     }
 
     getSong(e) {
-        let musicName;
-        if ((e.path[0].tagName).toLowerCase() == 'a') {
-            musicName = e.path[0].dataset.audioname;
-            this.audio.title = e.path[0].querySelector('.albumName').textContent;
-            this.audio.textContent = e.path[0].querySelector('.albumName').textContent;
-            this.audio.textContent = e.path[0].querySelector('img').src;
-
+        console.log();
+        let musicName = e.target.dataset.tracklist;
+        if (typeof musicName != 'undefined') {
+            this.audio.src = `./assets/data/${musicName}`;
+            this.musicStateChange();
         }
-        else if ((e.path[1].tagName).toLowerCase() == 'a') {
-            musicName = e.path[1].dataset.audioname;
-            this.audio.title = e.path[1].querySelector('.albumName').textContent;
-            this.audio.textContent = e.path[1].querySelector('.albumName').textContent;
-            this.audio.textContent = e.path[1].querySelector('img').src;
-
-        }
-
-        this.audio.src = `./assets/musics/${musicName}.mp3`;
-
-        this.musicStateChange();
     }
 
     playPause(e) {
         if (this.audio.paused) {
             this.audio.play();
-            this.el.playPauseBtn.innerHTML = "play_circle_outline";
+            this.el.playPauseBtn.innerHTML = "pause_circle_outline";
         } else {
             this.audio.pause();
-            this.el.playPauseBtn.innerHTML = "pause_circle_outline";
+            this.el.playPauseBtn.innerHTML = "play_circle_outline";
         }
     }
 
@@ -210,4 +193,4 @@ class MusicApp {
     }
 }
 
-let music = new MusicApp();
+export default MusicApp;
