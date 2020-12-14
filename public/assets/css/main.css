@@ -38,7 +38,7 @@ header {
     position: fixed;
     top: 50px;
     left: -100px;
-    width: 71px;
+    width: 350px;
     height: calc(100vh - 50px);
     background-color: #fff;
     padding: 15px 8px 8px;
@@ -54,18 +54,111 @@ header {
     left: 0px;
 }
 
-.queuePanel .queueTitle {
-    font-weight: 500;
-    padding: 0px 0px 15px;
+.queueHeader {
+    display: flex;
+    border-bottom: 1px solid #6e6e6e5b;
+    padding: 0px 0px 10px;
+    margin-bottom: 10px;
 }
+
+.queueHeader .queueTitle {
+    font-weight: 500;
+    flex: 1;
+    align-items: center;
+}
+
+.queueHeader .loopQueue,
+.queueHeader .shuffleQueue,
+.queueHeader .favQueue,
+.queueHeader .queueList {
+    font-size: 20px;
+    padding: 2px;
+    margin: 0px 5px;
+    cursor: pointer;
+}
+
+/* queue more btn */
+.popupStyle {
+    position: absolute;
+    top: 135px;
+    left: 345px;
+    width: 200px;
+    z-index: 10;
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 0 3px 1px rgb(0 0 0 / 32%);
+    padding: 10px 0px;
+}
+
+.popupStyle a {
+    padding: 10px 10px;
+    display: block;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.popupStyle a:hover {
+    background-color: #f0f0f0;
+}
+
+.queueMore.hide {
+    display: none;
+}
+
+/* playlist popup */
+
+.playlistPop.popupStyle {
+    top: 75px;
+    left: 345px;
+}
+
+.playlistPop.hide {
+    display: none;
+}
+
+
+
+/* .queueHeader */
 
 .queueList li {
     padding-bottom: 8px;
 }
 
-.queueList li img,
-.currMusic img {
+.queueThumb,
+.thumbWrap {
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid #6d6d6d5b;
     width: 55px;
+    height: 55px;
+}
+
+.queueThumb img,
+.thumbWrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.queueList .queueItem {
+    display: flex;
+    align-items: center;
+}
+
+.queueItem .removeBtn,
+.queueItem .moreOpt {
+    margin-left: 4px;
+    font-size: 18px;
+    padding: 4px;
+}
+
+.queueItem .trackName {
+    margin-left: 10px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 footer {
@@ -94,7 +187,7 @@ footer .currMusic {
     padding-right: 20px;
     width: 300px;
 }
-footer .currMusic img {
+footer .thumbWrap {
     margin-right: 10px;
 }
 
@@ -137,7 +230,7 @@ footer .timeEvent {
     z-index: 1;
     transition: all 0.3s ease-in;
 }
-.main.activePlayer{
+.main.activePlayer {
     padding-left: 120px;
 }
 #playerEff {
@@ -193,7 +286,7 @@ footer .timeEvent {
     border: 1px solid #cdcdcd;
     border-radius: 7px;
     position: relative;
-    transition: all .3s;
+    transition: all 0.3s;
 }
 
 .listGroup .imgWrap::after {
@@ -211,7 +304,7 @@ footer .timeEvent {
     cursor: pointer;
     visibility: hidden;
     opacity: 0;
-    transition: all .2s;
+    transition: all 0.2s;
     /* background-color: rgba(0, 0, 0, 0.301); */
 }
 
@@ -230,14 +323,13 @@ footer .timeEvent {
     top: -10px;
     background-color: white;
     border-radius: 50%;
-    transition: all .2s;
+    transition: all 0.2s;
     display: flex;
     align-items: flex-end;
     justify-content: flex-start;
     font-size: 19px;
     color: #dc2929;
 }
-
 
 .listGroup.playlist .imgWrap:first-child::before {
     content: 'library_music';
@@ -336,7 +428,7 @@ a {
     padding: 3px;
     color: #ababab;
     cursor: pointer;
-    transition: all .3s;
+    transition: all 0.3s;
     border: 1px solid #9f9f9f;
 }
 

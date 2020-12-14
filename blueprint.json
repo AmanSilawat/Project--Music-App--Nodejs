@@ -1,0 +1,188 @@
+[
+    {
+        "name": "singer",
+        "type": "folder",
+        "children": [
+            {
+                "name": "atif-aslam",
+                "type": "folder",
+                "children": [
+                    {
+                        "type": "track",
+                        "tracks": ["wohi-khuda-hai-coke-studio.mp3"]
+                    }
+                ]
+            },
+            {
+                "name": "owais-raza-qadri",
+                "type": "folder",
+                "children": [
+                    {
+                        "type": "track",
+                        "tracks": [
+                            "likh-raha-hoon-naat-sarwar.mp3",
+                            "nabi-ka-jashn-aya.mp3",
+                            "kabay-ki-ronaq.mp3",
+                            "ishq-k-rang-main-rang-jao.mp3"
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "hafiz-ahmed-raza-qadri",
+                "type": "folder",
+                "children": [
+                    {
+                        "type": "track",
+                        "tracks": [
+                            "paigham-saba-lai-hai.mp3",
+                            "dil-pukare-ya-ali-manqabat.mp3",
+                            "tu-kuja-mann-kuja.mp3",
+                            "mera-koi-nahi-hai-tere-siwa.mp3"
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "album",
+        "type": "folder",
+        "children": [
+            {
+                "name": "al-nabi-sallu-alai",
+                "type": "folder",
+                "children": [
+                    {
+                        "type": "track",
+                        "tracks": [
+                            "likh-raha-hoon-naat.mp3",
+                            "aye-aqa-madni-aqa.mp3",
+                            "allah-ho-allah-ho-dam-ba-dam.mp3",
+                            "kaliyan-zulfan-wala.mp3"
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "aarzoo-e-rehmat",
+                "type": "folder",
+                "children": [
+                    {
+                        "type": "track",
+                        "tracks": [
+                            "aane-walon-yeh-to-batao-irulz.mp3",
+                            "sab-se-owlah-wa-aalah-irulz.mp3"
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "rang-de-maula",
+                "type": "folder",
+                "children": [
+                    {
+                        "type": "track",
+                        "tracks": ["padho-durood.mp3", "rang-de-maula.mp3"]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "genre",
+        "type": "folder",
+        "children": [
+            {
+                "name": "naat-sharif",
+                "type": "folder",
+                "children": [
+                    {
+                        "type": "track",
+                        "tracks": [
+                            "paigham-saba-lai-hai.mp3",
+                            "likh-raha-hoon-naat-sarwar.mp3",
+                            "wohi-khuda-hai-coke-studio.mp3",
+                            "nabi-ka-jashn-aya.mp3",
+                            "dil-pukare-ya-ali-manqabat.mp3",
+                            "kabay-ki-ronaq.mp3",
+                            "ishq-k-rang-main-rang-jao.mp3",
+                            "tu-kuja-mann-kuja.mp3",
+                            "mera-koi-nahi-hai-tere-siwa.mp3"
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "qawwalies",
+                "type": "folder",
+                "children": [
+                    {
+                        "name": "best-qawwalies",
+                        "type": "folder",
+                        "children": [
+                            {
+                                "type": "track",
+                                "tracks": ["mohammed-ke-shaher-mein.mp3"]
+                            }
+                        ]
+                    },
+                    {
+                        "name": "sufi-qawwalis",
+                        "type": "folder",
+                        "children": [
+                            {
+                                "type": "track",
+                                "tracks": [
+                                    "Aaya-Tere-Dar-Par.mp3",
+                                    "bhar-do-jholi-meri.mp3",
+                                    "kun-faya-kun.mp3"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "top5",
+        "type": "folder",
+        "children": [
+            {
+                "type": "track",
+                "tracks": [
+                    "aaya-tere-dar-par.mp3",
+                    "likh-raha-hoon-naat-sarwar.mp3",
+                    "aane-walon-yeh-to-batao-irulz.mp3",
+                    "wohi-khuda-hai-coke-studio.mp3",
+                    "tu-kuja-mann-kuja.mp3"
+                ]
+            }
+        ]
+    }
+]
+
+
+
+album/atif
+
+searching 
+[
+    0,
+    1,
+    2,
+    3, album [
+    4,          0,
+    5,          1,
+]               2,
+                3,
+                4,
+                5,  {
+                6,      atif
+            ]           children : ['asdf', 'skldfj', sddfj]
+
+
+3album5atif
+
+kdsfjkjdfkjd

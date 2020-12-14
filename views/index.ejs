@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,15 +10,52 @@
     <link rel="icon" type="image/png" sizes="128x128" href="./assets/images/music.png" />
     <link rel="stylesheet" href="./assets/css/main.css">
 </head>
+
 <body>
     <header>
         <span class="logo">Sangeet App</span>
-        
+
     </header>
     <section class="constainer">
-        <div class="queuePanel">
-            <div class="queueTitle">Queue</div>
-            <ul class="queueList"></ul>
+        <div class="queueMore popupStyle hide">
+            <a href="javascript:void(0)">Add to Favorite</a>
+            <a href="javascript:void(0)">Add to Playlist</a>
+        </div>
+
+        <div class="playlistPop popupStyle hide">
+            <a href="javascript:void(0)">Create New List</a>
+            <a href="javascript:void(0)">Show List</a>
+        </div>
+        <div class="queuePanel" style="display: none;">
+            <div class="queueHeader">
+                <div class="queueTitle">Queue</div>
+                <div class="loopQueue material-icons" title="loop">loop</div>
+                <div class="shuffleQueue material-icons" title="Shuffle">shuffle</div>
+                <div class="favQueue material-icons" title="Favorite">favorite</div>
+                <div class="queueList material-icons" title="PlayList">queue_music</div>
+            </div>
+            <ul class="queueList">
+                <li>
+                    <a class="queueItem" href="javascript:void(0)">
+                        <div class="queueThumb">
+                            <img src="http://localhost:8080/assets/images/loading.gif">
+                        </div>
+                        <div class="trackName">Song Name name name name name name</div>
+                        <div class="removeBtn material-icons">close</div>
+                        <div class="moreOpt material-icons">more_vert</div>
+                    </a>
+                </li>
+                <li>
+                    <a class="queueItem" href="javascript:void(0)">
+                        <div class="queueThumb">
+                            <img src="http://localhost:8080/assets/images/loading.gif">
+                        </div>
+                        <div class="trackName">Song Name name name name name name</div>
+                        <div class="removeBtn material-icons">close</div>
+                        <div class="moreOpt material-icons">more_vert</div>
+                    </a>
+                </li>
+            </ul>
         </div>
         <div class="main">
             <div id="playerEff"></div>
@@ -33,14 +71,17 @@
             </div>
         </div>
         <div class="currMusic">
-            <img id="musicThumbnil" src="" alt="img" />
+            <div class="thumbWrap">
+                <img id="musicThumbnil" src="" alt="img" />
+            </div>
             <span id="musicTitile">Song Name</span>
         </div>
         <div class="musicState">
             <div id="musicEvent">
-                <a href="javascript:void(0)" ><span class="material-icons">skip_previous</span></a>
-                <a href="javascript:void(0)"><span id="playPauseBtn" class="material-icons">pause_circle_outline</span></a>
-                <a href="javascript:void(0)" ><span class="material-icons">skip_next</span></a>
+                <a href="javascript:void(0)"><span class="material-icons">skip_previous</span></a>
+                <a href="javascript:void(0)"><span id="playPauseBtn"
+                        class="material-icons">pause_circle_outline</span></a>
+                <a href="javascript:void(0)"><span class="material-icons">skip_next</span></a>
             </div>
             <div class="timeEvent">
                 <span class="currentTimeState" id="currTimeState">02:12</span>
@@ -58,4 +99,5 @@
     <script src="assets/js/app.js" type="module"></script>
     <script></script>
 </body>
+
 </html>
