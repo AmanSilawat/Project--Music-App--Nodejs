@@ -1,5 +1,5 @@
 class MusicAppView {
-    constructor(musicDir, pageType) {
+    constructor(musicDir, pageType, prevPageDetail = undefined) {
         // create Element
         this.el = {
             container: document.getElementById('container'),
@@ -25,6 +25,7 @@ class MusicAppView {
         this.el.albumName.classList.add('albumName');
 
         // extra variable
+        this.prevPageDetail = prevPageDetail;
         this.trackData = null;
         this.musicDir = musicDir;
 
@@ -38,8 +39,9 @@ class MusicAppView {
                 break;
 
             case 'inner_page':
-                console.log('inner_page');
-                this.setDesignView(musicDir.name, musicDir.type, musicDir.children);
+                let y = this.setDesignView(this.prevPageDetail.prevPath, musicDir.type, musicDir.children);
+                this.prevPageDetail.currGroup.classList.add('hideGroup');
+                this.prevPageDetail.currGroup.insertAdjacentElement('afterend', y);
                 break;
 
             default:
@@ -71,7 +73,7 @@ class MusicAppView {
         const listGrid = this.el.listGrid.cloneNode(true);
 
         // access clone node
-        listGroupHead.textContent = heading;
+        listGroupHead.textContent = heading.replace(/.*?\//gi, '').replace(/-/g, ' ');;
         listGroup.appendChild(listGroupHead);
 
         for (const gridItem of children) {
@@ -99,17 +101,17 @@ class MusicAppView {
         const imgWrap = this.el.imgWrap.cloneNode(true);
         const songImg = this.el.songImg.cloneNode(true);
         const albumName = this.el.albumName.cloneNode(true);
-        
+
         const noSpaceImgName = gridItem.name.replace(/ /g, '-');
-        
+
         // access clone node
         // listAnchor.href = `javascript:void(0)`;
-        listAnchor.href = `${heading}/${noSpaceImgName}`;
+        // listAnchor.href = `${heading}/${noSpaceImgName}`;
         listAnchor.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
         songImg.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
         albumName.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
         imgWrap.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
-        albumName.textContent = gridItem.name;
+        albumName.textContent = gridItem.name.replace(/-/g, ' ');
 
         // append all nodes
         imgWrap.appendChild(songImg);
@@ -129,10 +131,12 @@ class MusicAppView {
             const songImg = this.el.songImg.cloneNode(true);
             const albumName = this.el.albumName.cloneNode(true);
 
-            const trackTrim = track.replace(/\.mp3/, '.jpg');
+            const trackTrim = track.replace(/\.mp3/, '');
 
             // access clone node
             listAnchor.href = `javascript:void(0)`;
+            // heading = heading.replace(' ', '-');
+            // heading = heading ? ${heading}/${track} : heading;
             listAnchor.setAttribute('data-tracklist', `${heading}/${track}`);
             imgWrap.setAttribute('data-tracklist', `${heading}/${track}`);
             songImg.setAttribute('data-tracklist', `${heading}/${track}`);
@@ -154,24 +158,14 @@ class MusicAppView {
             case 'folder':
                 var get_jsonData = await fetch(`./assets/data/${heading}/${folderName}/info.json`);
                 var imgData = await get_jsonData.json();
-                var imgName = imgData.thumbnail_name;
+                var imgName = imgData.main_poster;
                 break;
 
             case 'track':
+                var get_jsonData = await fetch(`./assets/data/${heading}/info.json`);
+                var imgData = await get_jsonData.json();
+                var imgName = imgData.trackImg[folderName];
 
-                // console.log(this.trackData);
-                if (this.trackData == null) {
-                    var get_jsonData = fetch(`./assets/data/${heading}/info.json`);
-                    get_jsonData.then((res=> {
-                        return res.json();
-                    })).then(data=> {
-                        this.trackData = data.trackImg;
-                    });
-                } else {
-
-                }
-                // var imgName = imgData.thumbnail_name;
-                var imgName = folderName;
                 break;
 
             default:

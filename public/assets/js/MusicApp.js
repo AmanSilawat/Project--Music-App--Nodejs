@@ -1,6 +1,7 @@
 class MusicApp {
-    constructor(musicAppView) {
-        this.musicAppView = musicAppView;
+    constructor(musicAppViewInstance, MusicAppView) {
+        this.musicAppViewInstance = musicAppViewInstance;
+        this.MusicAppView = MusicAppView;
         this.audio = new Audio();
         this.audioDuration = null;
         this.audioInterval = null; // assigin music progress bar setInterval
@@ -21,13 +22,12 @@ class MusicApp {
             musicThumbnil: document.getElementById('musicThumbnil'),
             playerPanel: document.querySelector('footer'),
             imgEff: document.getElementById('playerEff'),
-            listAnchor: document.querySelectorAll('a[data-img]')
+            listAnchor: document.querySelectorAll('a[data-img]'),
+            container: document.getElementById('container')
         }
-
-        // Listen Event on all music
-        for (const m of this.el.musicRowNode) {
-            m.addEventListener('click', this.getSong.bind(this), true);
-        }
+        
+        // Listen Event on container
+        this.el.container.addEventListener('click', this.containerEvent.bind(this), true);
 
         // Listen Event on Play/Pause button
         this.el.playPauseBtn.addEventListener('click', this.playPause.bind(this));
@@ -45,40 +45,67 @@ class MusicApp {
 
         this.audioBarMainWidth = window.getComputedStyle(this.el.audioBarMain).getPropertyValue('width').slice(0, -2);
         this.deagNDrop();
+    }
 
-        // inner page
-        for (const anchor of this.el.listAnchor) {
-            anchor.addEventListener('click', this.hasChange.bind(this));
+    containerEvent(e) {
+        e.preventDefault();
+
+        if (e.target.hasAttribute('data-tracklist') == true) {
+            this.getSong(e)
+        }
+
+        if (e.target.hasAttribute('data-img') == true) {
+            this.innerContent(e);
         }
     }
 
-    hasChange(e) {
-        const dataset = e.target.dataset.img.split('/').map((el) => el.replace(/ /g, '-'));
-        let musicTree = this.musicAppView.musicDir;
+    innerContent(e) {
+        let datasetStr = e.target.dataset.img;
+        const datasetArr = datasetStr.split('/').map((el) => el.replace(/ /g, '-'));
+        let firstVal = datasetArr[0];
+        let musicTree = this.musicAppViewInstance.musicDir;
 
         let i = 0;
-        let popedVal = dataset.shift();
+        let popedVal = datasetArr.shift();
         while (musicTree.length > i) {
             let trimed = musicTree[i].name.replace(/ /g, '-');
 
             if (trimed == popedVal) {
-                if (dataset.length == 0) {
+                if (datasetArr.length == 0) {
                     musicTree = musicTree[i];
                     break;
                 }
                 musicTree = musicTree[i].children;
-                popedVal = dataset.shift() || false;
+                popedVal = datasetArr.shift() || false;
                 i = 0;
                 continue;
             }
             i++;
         }
+        const prevPageDetail = {
+            prevPath: datasetStr,
+            currGroup: e.path.find((el)=> el.classList.contains('listGroup'))
+        }
+        const musicAppView = new this.MusicAppView(musicTree, 'inner_page', prevPageDetail);
     }
 
     getSong(e) {
-        console.log();
         let musicName = e.target.dataset.tracklist;
+        let ePath = Array.from(e.path);
+        let blobImg;
+
+        // get image source
+        for (const ele of ePath) {
+            if (ele.tagName.toLowerCase() == 'a') {
+                blobImg = ele.querySelector('.songImg').src;
+                break;
+            }
+        }
+        
+        // set audio source info
         if (typeof musicName != 'undefined') {
+            this.audio.dataset.imgSrc = blobImg;
+            this.audio.title = musicName.match(/\/(.*)\.mp3$/)[1].replace(/-/g, ' ');
             this.audio.src = `./assets/data/${musicName}`;
             this.musicStateChange();
         }
@@ -124,7 +151,7 @@ class MusicApp {
 
             // chnage current player thamblin and titile
             this.el.musicTitile.textContent = this.audio.title;
-            this.el.musicThumbnil.src = this.audio.textContent;
+            this.el.musicThumbnil.src = this.audio.dataset.imgSrc;
 
             // activePlayer
             this.el.playerPanel.classList.add('activePlayer');

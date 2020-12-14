@@ -1,5 +1,7 @@
 {
-    "thumbnail_name": "arzoo-e-rahamat.jpg",
-    "description": "details",
-    "album_by": "aarzoo-e-rehmat"
+    "main_poster": "arzoo-e-rahamat.jpg",
+    "trackImg": {
+        "aane-walon-yeh-to-batao-irulz": "arzoo-e-rahamat.jpg",
+        "sab-se-owlah-wa-aalah-irulz": "arzoo-e-rahamat.jpg"
+    }
 }

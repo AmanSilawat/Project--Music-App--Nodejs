@@ -100,6 +100,7 @@ footer .currMusic #musicTitile {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-transform: capitalize;
 }
 
 footer .musicState {
@@ -205,6 +206,7 @@ a {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-transform: capitalize;
 }
 
 /* audio track */
@@ -245,4 +247,8 @@ a {
 
 .audioTrackWrap:hover .currentPoint .draggable {
     visibility: visible;
+}
+
+.hideGroup {
+    display: none;
 }
