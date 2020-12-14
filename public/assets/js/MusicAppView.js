@@ -14,7 +14,7 @@ class MusicAppView {
         }
         // add info in Elements
         this.el.listGroup.classList.add('listGroup');
-        this.el.listGroupHead.classList.add('listGroup');
+        this.el.listGroupHead.classList.add('title');
         this.el.listGrid.classList.add('listGrid');
         this.el.listItem.classList.add('listItem');
         this.el.listAnchor.classList.add('listAnchor');
@@ -33,15 +33,23 @@ class MusicAppView {
         switch (pageType) {
             case 'home_page':
                 for (const item of this.musicDir) {
+                    console.log(item)
                     let x = this.setDesignView(item.name, item.type, item.children);
                     this.el.container.appendChild(x)
                 }
                 break;
 
             case 'inner_page':
-                let y = this.setDesignView(this.prevPageDetail.prevPath, musicDir.type, musicDir.children);
+                let currentGroup = this.setDesignView(this.prevPageDetail.prevPath, musicDir.type, musicDir.children);
+
+                // // add back button
+                let backBtn = document.createElement('div')
+                backBtn.className += 'backBtn material-icons';
+                backBtn.textContent = 'arrow_back';
+                currentGroup.insertAdjacentElement('afterbegin', backBtn);
+
                 this.prevPageDetail.currGroup.classList.add('hideGroup');
-                this.prevPageDetail.currGroup.insertAdjacentElement('afterend', y);
+                this.prevPageDetail.currGroup.insertAdjacentElement('afterend', currentGroup);
                 break;
 
             default:
@@ -53,11 +61,11 @@ class MusicAppView {
     setDesignView(name, dirType, children) {
         switch (dirType) {
             case 'song':
-                return this.genrateDOM(name, children);
+                return this.genrateDOM(name, children, dirType);
                 break;
 
             case 'folder':
-                return this.genrateDOM(name, children);
+                return this.genrateDOM(name, children, dirType);
                 break;
 
             default:
@@ -79,11 +87,11 @@ class MusicAppView {
         for (const gridItem of children) {
             switch (gridItem.type) {
                 case 'folder':
-                    this.handleFolder(heading, gridItem, listGrid);
+                    this.handleFolder(heading, gridItem, listGrid, listGroup);
                     break;
 
                 case 'track':
-                    this.handleTrack(heading, gridItem, listGrid)
+                    this.handleTrack(heading, gridItem, listGrid, listGroup)
                     break;
 
                 default:
@@ -94,7 +102,7 @@ class MusicAppView {
         return listGroup;
     }
 
-    handleFolder(heading, gridItem, listGrid) {
+    handleFolder(heading, gridItem, listGrid, listGroup) {
         // clone node
         const listItem = this.el.listItem.cloneNode(true);
         const listAnchor = this.el.listAnchor.cloneNode(true);
@@ -111,7 +119,9 @@ class MusicAppView {
         songImg.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
         albumName.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
         imgWrap.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
+        imgWrap.classList.add('material-icons');
         albumName.textContent = gridItem.name.replace(/-/g, ' ');
+        listGroup.classList.add('playlist')
 
         // append all nodes
         imgWrap.appendChild(songImg);
@@ -122,7 +132,7 @@ class MusicAppView {
         this.loadImg(heading, gridItem.name, songImg, 'folder');
     }
 
-    handleTrack(heading, gridItem, listGrid) {
+    handleTrack(heading, gridItem, listGrid, listGroup) {
         // clone node
         for (const track of gridItem.tracks) {
             const listItem = this.el.listItem.cloneNode(true);
@@ -142,6 +152,8 @@ class MusicAppView {
             songImg.setAttribute('data-tracklist', `${heading}/${track}`);
             albumName.setAttribute('data-tracklist', `${heading}/${track}`);
             albumName.textContent = track.replace(/(-)|(.mp3)/g, ' ').trim();
+            listGroup.classList.add('tracks')
+            imgWrap.classList.add('material-icons');
 
             // append all nodes
             imgWrap.appendChild(songImg);

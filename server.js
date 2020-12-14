@@ -16,10 +16,12 @@ app.get('/getData', function getDa(req, res) {
 });
 
 app.get('*', function unknowRequest(req, res) {
-    let url = req.url
+    const { url } = req;
     if (url.match(/\./g) == null) {
-        const musicDir = Utils.getDirData(res).then((response) => res.send(response.children));
-        Utils.getUnknow(musicDir, req.url)
+        const musicDir = Utils.getDirData(res).then((response) =>
+            res.send(response.children)
+        );
+        Utils.getUnknow(musicDir, req.url);
     } else {
         res.status(404).send('what???');
     }

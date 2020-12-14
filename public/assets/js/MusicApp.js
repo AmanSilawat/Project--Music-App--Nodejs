@@ -10,7 +10,6 @@ class MusicApp {
             playPauseBtn: document.getElementById('playPauseBtn'),
             muteBtn: document.getElementById('muteBtn'),
             loopBtn: document.getElementById('loopBtn'),
-            queuePanel: document.querySelector('.queuePanel'),
             totTimeState: document.getElementById('totTimeState'),
             audioTrackWrap: document.querySelector('.audioTrackWrap'),
             audioBar: document.querySelector('.currentPoint'),
@@ -24,6 +23,11 @@ class MusicApp {
             imgEff: document.getElementById('playerEff'),
             listAnchor: document.querySelectorAll('a[data-img]'),
             container: document.getElementById('container')
+        },
+        this.queue = {
+            visibity: false,
+            root: document.querySelector('.queueList'),
+            queuePanel: document.querySelector('.queuePanel')
         }
         
         // Listen Event on container
@@ -56,6 +60,14 @@ class MusicApp {
 
         if (e.target.hasAttribute('data-img') == true) {
             this.innerContent(e);
+        }
+
+        if (e.target.classList.contains('backBtn') == true) {
+            let currGroup = e.target.parentElement;
+            let prevGroup = e.target.parentElement.previousElementSibling;
+            currGroup.remove();
+            prevGroup.classList.remove('hideGroup')
+            console.log(currGroup, prevGroup);
         }
     }
 
@@ -154,11 +166,30 @@ class MusicApp {
             this.el.musicThumbnil.src = this.audio.dataset.imgSrc;
 
             // activePlayer
-            this.el.playerPanel.classList.add('activePlayer');
-            this.el.queuePanel.classList.add('activePlayer');
+            if (this.queue.visibity == false) {
+                let main = document.querySelector('.main');
+                this.queue.visibity = true;
+                this.el.playerPanel.classList.add('activePlayer');
+                this.queue.queuePanel.classList.add('activePlayer');
+                main.classList.add('activePlayer');
+            }
 
             this.el.imgEff.classList.add('activePlayer');
-            this.el.imgEff.style.backgroundImage = `url(${this.audio.textContent})`;
+            this.el.imgEff.style.backgroundImage = `url(${this.audio.dataset.imgSrc})`;
+
+            // append in mudic queue
+            // this.queueList
+            let li = document.createElement('li');
+            let anchor = document.createElement('a');
+            let img = document.createElement('img');
+
+            img.src = this.audio.dataset.imgSrc;
+            anchor.href = 'javascript:void(0)';
+
+            anchor.appendChild(img);
+            li.appendChild(anchor);
+            this.queue.root.appendChild(li);
+            console.log('asdf')
         });
     }
 
