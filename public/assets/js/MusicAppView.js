@@ -33,7 +33,6 @@ class MusicAppView {
         switch (pageType) {
             case 'home_page':
                 for (const item of this.musicDir) {
-                    console.log(item)
                     let x = this.setDesignView(item.name, item.type, item.children);
                     this.el.container.appendChild(x)
                 }
@@ -112,16 +111,30 @@ class MusicAppView {
 
         const noSpaceImgName = gridItem.name.replace(/ /g, '-');
 
+        // more options div on music grid
+        let moreOpt = document.createElement('div');
+        let fav = document.createElement('span')
+        let favPlaylist = document.createElement('span')
+        let closeBtn = document.createElement('span')
+
+        moreOpt.className += 'gridOpt material-icons';
+        fav.className += 'myFav material-icons';
+        favPlaylist.className += 'favPlaylist material-icons';
+        closeBtn.className += 'closeBtn material-icons';
+
+        albumName.textContent = gridItem.name.replace(/-/g, ' ');
+
         // access clone node
-        // listAnchor.href = `javascript:void(0)`;
-        // listAnchor.href = `${heading}/${noSpaceImgName}`;
         listAnchor.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
         songImg.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
-        albumName.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
         imgWrap.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
+        albumName.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
+        listGroup.classList.add('playlist');
+
+        // more options div on music grid
+        moreOpt.append(favPlaylist, fav, closeBtn);
         imgWrap.classList.add('material-icons');
-        albumName.textContent = gridItem.name.replace(/-/g, ' ');
-        listGroup.classList.add('playlist')
+        imgWrap.appendChild(moreOpt);
 
         // append all nodes
         imgWrap.appendChild(songImg);
@@ -143,17 +156,31 @@ class MusicAppView {
 
             const trackTrim = track.replace(/\.mp3/, '');
 
-            // access clone node
+            // more options div on music grid
+            let moreOpt = document.createElement('div');
+            let fav = document.createElement('span')
+            let favPlaylist = document.createElement('span')
+            let closeBtn = document.createElement('span')
+
+            moreOpt.className += 'gridOpt material-icons';
+            fav.className += 'myFav material-icons';
+            favPlaylist.className += 'favPlaylist material-icons';
+            closeBtn.className += 'closeBtn material-icons';
+
             listAnchor.href = `javascript:void(0)`;
-            // heading = heading.replace(' ', '-');
-            // heading = heading ? ${heading}/${track} : heading;
+
+            // access clone node
             listAnchor.setAttribute('data-tracklist', `${heading}/${track}`);
-            imgWrap.setAttribute('data-tracklist', `${heading}/${track}`);
             songImg.setAttribute('data-tracklist', `${heading}/${track}`);
+            imgWrap.setAttribute('data-tracklist', `${heading}/${track}`);
             albumName.setAttribute('data-tracklist', `${heading}/${track}`);
             albumName.textContent = track.replace(/(-)|(.mp3)/g, ' ').trim();
-            listGroup.classList.add('tracks')
+            listGroup.classList.add('tracks');
+
+            // more options div on music grid
+            moreOpt.append(favPlaylist, fav, closeBtn);
             imgWrap.classList.add('material-icons');
+            imgWrap.appendChild(moreOpt);
 
             // append all nodes
             imgWrap.appendChild(songImg);

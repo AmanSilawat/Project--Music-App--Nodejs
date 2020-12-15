@@ -23,13 +23,20 @@ class MusicApp {
             imgEff: document.getElementById('playerEff'),
             listAnchor: document.querySelectorAll('a[data-img]'),
             container: document.getElementById('container')
-        },
+        };
         this.queue = {
             visibity: false,
             root: document.querySelector('.queueList'),
             queuePanel: document.querySelector('.queuePanel')
         }
-        
+
+        this.eventListener();
+
+        this.audioBarMainWidth = window.getComputedStyle(this.el.audioBarMain).getPropertyValue('width').slice(0, -2);
+        this.deagNDrop();
+    }
+
+    eventListener() {
         // Listen Event on container
         this.el.container.addEventListener('click', this.containerEvent.bind(this), true);
 
@@ -47,8 +54,9 @@ class MusicApp {
             this.seekingAudio(e.x, 'drop');
         }.bind(this));
 
-        this.audioBarMainWidth = window.getComputedStyle(this.el.audioBarMain).getPropertyValue('width').slice(0, -2);
-        this.deagNDrop();
+        // Mouse Over on Queue bar
+        this.queue.queuePanel.addEventListener('mouseenter', (event) => this.toggleQueueBar(event, 'focus_in'))
+        this.queue.queuePanel.addEventListener('mouseleave', (event) => this.toggleQueueBar(event, 'focus_out'))
     }
 
     containerEvent(e) {
@@ -68,6 +76,14 @@ class MusicApp {
             currGroup.remove();
             prevGroup.classList.remove('hideGroup')
             console.log(currGroup, prevGroup);
+        }
+
+        if (e.target.classList.contains('gridOpt') == true) {
+            this.gridMore(e, 'showMore');
+        }
+
+        if (e.target.classList.contains('closeBtn') == true) {
+            this.gridMore(e, 'hideMore');
         }
     }
 
@@ -96,7 +112,7 @@ class MusicApp {
         }
         const prevPageDetail = {
             prevPath: datasetStr,
-            currGroup: e.path.find((el)=> el.classList.contains('listGroup'))
+            currGroup: e.path.find((el) => el.classList.contains('listGroup'))
         }
         const musicAppView = new this.MusicAppView(musicTree, 'inner_page', prevPageDetail);
     }
@@ -113,7 +129,7 @@ class MusicApp {
                 break;
             }
         }
-        
+
         // set audio source info
         if (typeof musicName != 'undefined') {
             this.audio.dataset.imgSrc = blobImg;
@@ -189,7 +205,6 @@ class MusicApp {
             anchor.appendChild(img);
             li.appendChild(anchor);
             this.queue.root.appendChild(li);
-            console.log('asdf')
         });
     }
 
@@ -276,6 +291,38 @@ class MusicApp {
 
             default:
                 console.log('Somting went worng');
+                break;
+        }
+    }
+
+    // click on more button in grid
+    gridMore(e, type) {
+
+        switch (type) {
+            case 'showMore':
+                e.target.parentElement.classList.add('active');
+                break;
+
+            case 'hideMore':
+                e.target.parentElement.parentElement.classList.remove('active');
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    toggleQueueBar(e, focus_type) {
+        switch (focus_type) {
+            case 'focus_in':
+                this.queue.queuePanel.classList.remove('shortView')
+                break;
+
+            case 'focus_out':
+                this.queue.queuePanel.classList.add('shortView')
+                break;
+
+            default:
                 break;
         }
     }

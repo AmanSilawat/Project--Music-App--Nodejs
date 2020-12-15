@@ -5,6 +5,9 @@
 }
 body {
     font-family: 'Montserrat', sans-serif;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
 }
 /* img{display: block;} */
 
@@ -37,7 +40,8 @@ header {
 .queuePanel {
     position: fixed;
     top: 50px;
-    left: -100px;
+    left: 0px;
+    /* left: -100px; */
     width: 350px;
     height: calc(100vh - 50px);
     background-color: #fff;
@@ -65,6 +69,7 @@ header {
     font-weight: 500;
     flex: 1;
     align-items: center;
+    padding-right: 10px;
 }
 
 .queueHeader .loopQueue,
@@ -92,21 +97,26 @@ header {
 }
 
 .popupStyle a {
-    padding: 10px 10px;
+    padding: 8px 10px;
     display: block;
     border-bottom: 1px solid #f0f0f0;
+    font-size: 16px;
+}
+
+.popupStyle a:last-child {
+    border-bottom: none;
 }
 
 .popupStyle a:hover {
     background-color: #f0f0f0;
 }
 
+/* queue more option btn */
 .queueMore.hide {
     display: none;
 }
 
 /* playlist popup */
-
 .playlistPop.popupStyle {
     top: 75px;
     left: 345px;
@@ -116,10 +126,17 @@ header {
     display: none;
 }
 
+/* grid popup more opt */
+.gridPop.popupStyle {
+    top: 120px;
+    left: 245px;
+}
 
+.gridPop.hide {
+    display: none;
+}
 
 /* .queueHeader */
-
 .queueList li {
     padding-bottom: 8px;
 }
@@ -131,6 +148,7 @@ header {
     border: 1px solid #6d6d6d5b;
     width: 55px;
     height: 55px;
+    flex: none;
 }
 
 .queueThumb img,
@@ -313,9 +331,10 @@ footer .timeEvent {
     opacity: 1;
 }
 
-.listGroup .imgWrap:before {
-    width: 28px;
-    height: 28px;
+.listGroup .imgWrap:before,
+.imgWrap .gridOpt {
+    width: 37px;
+    height: 37px;
     box-shadow: 0px 0px 9px 2px rgb(0 0 0 / 32%);
     padding: 4px;
     position: absolute;
@@ -329,6 +348,7 @@ footer .timeEvent {
     justify-content: flex-start;
     font-size: 19px;
     color: #dc2929;
+    box-sizing: border-box;
 }
 
 .listGroup.playlist .imgWrap:first-child::before {
@@ -348,6 +368,60 @@ footer .timeEvent {
 .listGroup .imgWrap:hover::before {
     top: -50px;
     right: -50px;
+}
+
+.imgWrap .gridOpt {
+    content: '';
+    visibility: visible;
+    opacity: 1;
+    padding: 3px;
+    font-size: 19px;
+    color: #000;
+    width: 32px;
+    height: 32px;
+    top: -50px;
+    right: -50px;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.imgWrap:hover .gridOpt {
+    right: -10px;
+    top: -10px;
+}
+
+.imgWrap .gridOpt::before {
+    content: 'more_vert';
+}
+
+.imgWrap.active .gridOpt::before {
+    content: 'more_vert';
+    display: none;
+}
+
+.imgWrap.active .gridOpt {
+    width: 140%;
+    height: 140%;
+    right: -40px;
+    top: -40px;
+    transition: all 0.3s;
+    backdrop-filter: blur(4px);
+    background-color: #fff6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: default;
+}
+
+.imgWrap.active:hover .gridOpt {
+    right: -40px;
+    top: -40px;
+}
+
+.listGroup .imgWrap.active:before,
+.listGroup .imgWrap.active::after {
+    visibility: hidden !important;
+    opacity: 0 !important;
 }
 
 .listGroup .listItem a {
@@ -436,4 +510,76 @@ a {
     background-color: #e73838;
     border-color: #e73838;
     color: #fff;
+}
+
+.myFav,
+.favPlaylist,
+.closeBtn {
+    visibility: hidden;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.closeBtn{
+    transition: all .7s;
+}
+
+.imgWrap.active .myFav,
+.imgWrap.active .favPlaylist,
+.imgWrap.active .closeBtn {
+    visibility: visible;
+    opacity: 1;
+}
+
+.myFav::after {
+    content: 'favorite';
+}
+.favPlaylist::after {
+    content: 'playlist_add';
+}
+.closeBtn::after {
+    content: 'cancel';
+}
+
+.imgWrap .closeBtn {
+    position: absolute;
+    right: -50px;
+    top: -50px;
+    color: #000;
+}
+
+.imgWrap.active .closeBtn {
+    right: 44px;
+    top: 44px;
+}
+
+.imgWrap .myFav,
+.imgWrap .favPlaylist {
+    margin: 10px;
+    padding: 2px;
+    color: #dc292a;
+    font-size: 44px;
+}
+
+.imgWrap .favPlaylist {
+    color: #000;
+}
+
+
+/* shortView Of queue */
+.shortView {
+    width: 71px;
+}
+
+.queueItem .trackName,
+.queueItem .removeBtn,
+.queueItem .moreOpt {
+    transition: all .1s;
+}
+
+.queueItem.shortView .trackName,
+.queueItem.shortView .removeBtn,
+.queueItem.shortView .moreOpt {
+    visibility: hidden;
+    opacity: 0;
 }
