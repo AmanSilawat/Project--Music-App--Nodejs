@@ -11,6 +11,7 @@ class MusicAppView {
             imgWrap: document.createElement('div'),
             songImg: document.createElement('img'),
             albumName: document.createElement('div'),
+            gridMoreOpt: document.createElement('div')
         }
         // add info in Elements
         this.el.listGroup.classList.add('listGroup');
@@ -28,6 +29,8 @@ class MusicAppView {
         this.prevPageDetail = prevPageDetail;
         this.trackData = null;
         this.musicDir = musicDir;
+
+        this.init();
 
         // call function according to type
         switch (pageType) {
@@ -55,6 +58,29 @@ class MusicAppView {
                 console.log('something went wrong!');
                 break;
         }
+    }
+
+    init() {
+        // more options div on music grid
+        let fav = document.createElement('span');
+        let favPlaylist = document.createElement('span');
+        let addToQueue = document.createElement('span');
+        let closeBtn = document.createElement('span');
+
+        this.el.gridMoreOpt.className += 'gridOpt material-icons';
+        fav.className += 'myFav material-icons';
+        favPlaylist.className += 'favPlaylist material-icons';
+        closeBtn.className += 'closeBtn material-icons';
+        addToQueue.classList += 'addToQueue material-icons';
+
+        fav.setAttribute('title', 'Add Favorite');
+        favPlaylist.setAttribute('title', 'Add to Playlist');
+        addToQueue.setAttribute('title', 'Add to Queue');
+        closeBtn.setAttribute('title', 'Close');
+        // make tooltip
+
+
+        this.el.gridMoreOpt.append(favPlaylist, fav, addToQueue, closeBtn);
     }
 
     setDesignView(name, dirType, children) {
@@ -86,11 +112,11 @@ class MusicAppView {
         for (const gridItem of children) {
             switch (gridItem.type) {
                 case 'folder':
-                    this.handleFolder(heading, gridItem, listGrid, listGroup);
+                    this.handleFolder({heading, gridItem, listGrid, listGroup});
                     break;
 
                 case 'track':
-                    this.handleTrack(heading, gridItem, listGrid, listGroup)
+                    this.handleTrack({heading, gridItem, listGrid, listGroup})
                     break;
 
                 default:
@@ -101,40 +127,52 @@ class MusicAppView {
         return listGroup;
     }
 
-    handleFolder(heading, gridItem, listGrid, listGroup) {
+    handleFolder(config) {
+        let domConfig = this.trackAndFolder(config.listGrid);
+
+        const noSpaceImgName = config.gridItem.name.replace(/ /g, '-');
+
+        // access clone node
+        domConfig.listAnchor.setAttribute('data-img', `${config.heading}/${noSpaceImgName}`);
+        domConfig.songImg.setAttribute('data-img', `${config.heading}/${noSpaceImgName}`);
+        domConfig.imgWrap.setAttribute('data-img', `${config.heading}/${noSpaceImgName}`);
+        domConfig.albumName.setAttribute('data-img', `${config.heading}/${noSpaceImgName}`);
+        domConfig.albumName.textContent = config.gridItem.name.replace(/-/g, ' ');
+        config.listGroup.classList.add('playlist');
+
+        this.loadImg(config.heading, config.gridItem.name, domConfig.songImg, 'folder');
+    }
+
+    handleTrack(config) {
+        // clone node
+        for (const track of config.gridItem.tracks) {
+            let domConfig = this.trackAndFolder(config.listGrid);
+
+            domConfig.listAnchor.href = `javascript:void(0)`;
+            // access clone node
+            domConfig.listAnchor.setAttribute('data-tracklist', `${config.heading}/${track}`);
+            domConfig.songImg.setAttribute('data-tracklist', `${config.heading}/${track}`);
+            domConfig.imgWrap.setAttribute('data-tracklist', `${config.heading}/${track}`);
+            domConfig.albumName.setAttribute('data-tracklist', `${config.heading}/${track}`);
+            domConfig.albumName.textContent = track.replace(/(-)|(.mp3)/g, ' ').trim();
+            config.listGroup.classList.add('tracks');
+
+            const trackTrim = track.replace(/\.mp3/, '');
+            this.loadImg(config.heading, trackTrim, domConfig.songImg, 'track');
+        }
+    }
+
+    trackAndFolder(listGrid) {
         // clone node
         const listItem = this.el.listItem.cloneNode(true);
-        const listAnchor = this.el.listAnchor.cloneNode(true);
+        const listAnchor = this.el.listAnchor.cloneNode(true); 
         const imgWrap = this.el.imgWrap.cloneNode(true);
         const songImg = this.el.songImg.cloneNode(true);
         const albumName = this.el.albumName.cloneNode(true);
 
-        const noSpaceImgName = gridItem.name.replace(/ /g, '-');
-
         // more options div on music grid
-        let moreOpt = document.createElement('div');
-        let fav = document.createElement('span')
-        let favPlaylist = document.createElement('span')
-        let closeBtn = document.createElement('span')
-
-        moreOpt.className += 'gridOpt material-icons';
-        fav.className += 'myFav material-icons';
-        favPlaylist.className += 'favPlaylist material-icons';
-        closeBtn.className += 'closeBtn material-icons';
-
-        albumName.textContent = gridItem.name.replace(/-/g, ' ');
-
-        // access clone node
-        listAnchor.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
-        songImg.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
-        imgWrap.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
-        albumName.setAttribute('data-img', `${heading}/${noSpaceImgName}`);
-        listGroup.classList.add('playlist');
-
-        // more options div on music grid
-        moreOpt.append(favPlaylist, fav, closeBtn);
         imgWrap.classList.add('material-icons');
-        imgWrap.appendChild(moreOpt);
+        imgWrap.appendChild(this.el.gridMoreOpt.cloneNode(true));
 
         // append all nodes
         imgWrap.appendChild(songImg);
@@ -142,54 +180,7 @@ class MusicAppView {
         listItem.appendChild(listAnchor);
         listGrid.appendChild(listItem);
 
-        this.loadImg(heading, gridItem.name, songImg, 'folder');
-    }
-
-    handleTrack(heading, gridItem, listGrid, listGroup) {
-        // clone node
-        for (const track of gridItem.tracks) {
-            const listItem = this.el.listItem.cloneNode(true);
-            const listAnchor = this.el.listAnchor.cloneNode(true);
-            const imgWrap = this.el.imgWrap.cloneNode(true);
-            const songImg = this.el.songImg.cloneNode(true);
-            const albumName = this.el.albumName.cloneNode(true);
-
-            const trackTrim = track.replace(/\.mp3/, '');
-
-            // more options div on music grid
-            let moreOpt = document.createElement('div');
-            let fav = document.createElement('span')
-            let favPlaylist = document.createElement('span')
-            let closeBtn = document.createElement('span')
-
-            moreOpt.className += 'gridOpt material-icons';
-            fav.className += 'myFav material-icons';
-            favPlaylist.className += 'favPlaylist material-icons';
-            closeBtn.className += 'closeBtn material-icons';
-
-            listAnchor.href = `javascript:void(0)`;
-
-            // access clone node
-            listAnchor.setAttribute('data-tracklist', `${heading}/${track}`);
-            songImg.setAttribute('data-tracklist', `${heading}/${track}`);
-            imgWrap.setAttribute('data-tracklist', `${heading}/${track}`);
-            albumName.setAttribute('data-tracklist', `${heading}/${track}`);
-            albumName.textContent = track.replace(/(-)|(.mp3)/g, ' ').trim();
-            listGroup.classList.add('tracks');
-
-            // more options div on music grid
-            moreOpt.append(favPlaylist, fav, closeBtn);
-            imgWrap.classList.add('material-icons');
-            imgWrap.appendChild(moreOpt);
-
-            // append all nodes
-            imgWrap.appendChild(songImg);
-            listAnchor.append(imgWrap, albumName);
-            listItem.appendChild(listAnchor);
-            listGrid.appendChild(listItem);
-
-            this.loadImg(heading, trackTrim, songImg, 'track');
-        }
+        return {listItem, listAnchor, imgWrap, songImg, albumName};
     }
 
     async loadImg(heading, folderName, songImg, requestType) {

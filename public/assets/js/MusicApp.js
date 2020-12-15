@@ -21,24 +21,36 @@ class MusicApp {
             musicThumbnil: document.getElementById('musicThumbnil'),
             playerPanel: document.querySelector('footer'),
             imgEff: document.getElementById('playerEff'),
-            listAnchor: document.querySelectorAll('a[data-img]'),
-            container: document.getElementById('container')
+            listAnchor: document.querySelectorAll('a[data-img]')
         };
         this.queue = {
             visibity: false,
-            root: document.querySelector('.queueList'),
-            queuePanel: document.querySelector('.queuePanel')
+            info: {
+                currQueue: null,
+                currIndex: null
+            },
+            default: [],
+            favorite: [],
+            playlist: [],
+            root: document.querySelector('.queuePanel'),
+            queueList: document.querySelector('.queueList')
         }
+        this.init();
+    }
 
+    init() {
+        // Listen all Events
         this.eventListener();
 
         this.audioBarMainWidth = window.getComputedStyle(this.el.audioBarMain).getPropertyValue('width').slice(0, -2);
         this.deagNDrop();
+
+        this.audio.addEventListener('ended', (event) => this.addPrevAndNext(event));
     }
 
     eventListener() {
         // Listen Event on container
-        this.el.container.addEventListener('click', this.containerEvent.bind(this), true);
+        document.body.addEventListener('click', this.eventHandler.bind(this), true);
 
         // Listen Event on Play/Pause button
         this.el.playPauseBtn.addEventListener('click', this.playPause.bind(this));
@@ -55,11 +67,11 @@ class MusicApp {
         }.bind(this));
 
         // Mouse Over on Queue bar
-        this.queue.queuePanel.addEventListener('mouseenter', (event) => this.toggleQueueBar(event, 'focus_in'))
-        this.queue.queuePanel.addEventListener('mouseleave', (event) => this.toggleQueueBar(event, 'focus_out'))
+        this.queue.root.addEventListener('mouseenter', (event) => this.toggleQueueBar(event, 'focus_in'));
+        this.queue.root.addEventListener('mouseleave', (event) => this.toggleQueueBar(event, 'focus_out'));
     }
 
-    containerEvent(e) {
+    eventHandler(e) {
         e.preventDefault();
 
         if (e.target.hasAttribute('data-tracklist') == true) {
@@ -78,12 +90,19 @@ class MusicApp {
             console.log(currGroup, prevGroup);
         }
 
+        // music grid click to show hide
         if (e.target.classList.contains('gridOpt') == true) {
             this.gridMore(e, 'showMore');
         }
 
+        // music grid click to show hide
         if (e.target.classList.contains('closeBtn') == true) {
             this.gridMore(e, 'hideMore');
+        }
+
+        // add to queue
+        if (e.target.classList.contains('addToQueue') == true) {
+            this.addToQueue(e);
         }
     }
 
@@ -117,18 +136,19 @@ class MusicApp {
         const musicAppView = new this.MusicAppView(musicTree, 'inner_page', prevPageDetail);
     }
 
+    // goto to parent element then search img
+    get_target_ancher(ePath) {
+        for (const ele of ePath) {
+            if (ele.tagName.toLowerCase() == 'a') {
+                return ele;
+            }
+        }
+    }
+
     getSong(e) {
         let musicName = e.target.dataset.tracklist;
         let ePath = Array.from(e.path);
-        let blobImg;
-
-        // get image source
-        for (const ele of ePath) {
-            if (ele.tagName.toLowerCase() == 'a') {
-                blobImg = ele.querySelector('.songImg').src;
-                break;
-            }
-        }
+        let blobImg = this.get_target_ancher(ePath).querySelector('.songImg').src;
 
         // set audio source info
         if (typeof musicName != 'undefined') {
@@ -136,7 +156,9 @@ class MusicApp {
             this.audio.title = musicName.match(/\/(.*)\.mp3$/)[1].replace(/-/g, ' ');
             this.audio.src = `./assets/data/${musicName}`;
             this.musicStateChange();
+            this.addToQueue(e, true);
         }
+
     }
 
     playPause(e) {
@@ -171,6 +193,7 @@ class MusicApp {
 
     musicStateChange() {
         this.audio.play().then(() => {
+            console.log('playingggggggggggggggggggggg')
             this.audioDuration = this.audio.duration;
 
             // set time and progress bar
@@ -186,25 +209,12 @@ class MusicApp {
                 let main = document.querySelector('.main');
                 this.queue.visibity = true;
                 this.el.playerPanel.classList.add('activePlayer');
-                this.queue.queuePanel.classList.add('activePlayer');
+                this.queue.root.classList.add('activePlayer');
                 main.classList.add('activePlayer');
             }
 
             this.el.imgEff.classList.add('activePlayer');
             this.el.imgEff.style.backgroundImage = `url(${this.audio.dataset.imgSrc})`;
-
-            // append in mudic queue
-            // this.queueList
-            let li = document.createElement('li');
-            let anchor = document.createElement('a');
-            let img = document.createElement('img');
-
-            img.src = this.audio.dataset.imgSrc;
-            anchor.href = 'javascript:void(0)';
-
-            anchor.appendChild(img);
-            li.appendChild(anchor);
-            this.queue.root.appendChild(li);
         });
     }
 
@@ -315,15 +325,86 @@ class MusicApp {
     toggleQueueBar(e, focus_type) {
         switch (focus_type) {
             case 'focus_in':
-                this.queue.queuePanel.classList.remove('shortView')
+                this.queue.root.classList.remove('shortView')
                 break;
 
             case 'focus_out':
-                this.queue.queuePanel.classList.add('shortView')
+                this.queue.root.classList.add('shortView')
                 break;
 
             default:
                 break;
+        }
+    }
+
+    // add to queue
+    addToQueue(e, curr_play_state = false) {
+        const anchor_ele = this.get_target_ancher(Array.from(e.path));
+        if ('tracklist' in anchor_ele.dataset) {
+            // append queue in queue list
+            this.queue.queueList.appendChild(this.queue_track(anchor_ele));
+            
+            // add info current PLAYING track in Queue
+            if (curr_play_state ==  true) {
+                const trackPath = anchor_ele.dataset['tracklist'];
+                const getIndex = this.queue.default.push(trackPath);
+                this.queue.info.currQueue = 'default';
+                this.queue.info.currIndex = getIndex - 1;
+            } else {
+                const trackPath = anchor_ele.dataset['tracklist'];
+                this.queue.default.push(trackPath);
+            }
+        }
+    }
+
+    queue_track(anchor_ele) {
+        // create elements
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        const queueThumb = document.createElement('div');
+        const img = document.createElement('img');
+        const trackName = document.createElement('div');
+        const removeBtn = document.createElement('div');
+        const moreOpt = document.createElement('div');
+
+        // set info in elements
+        li.className += 'rowTrack';
+        a.className += 'queueItem';
+        a.href = 'javascript:void(0)';
+        queueThumb.className += 'queueThumb';
+        trackName.className += 'trackName';
+        removeBtn.className += 'removeBtn material-icons';
+        moreOpt.className += 'moreOpt material-icons';
+        removeBtn.textContent = 'close';
+        moreOpt.textContent = 'more_vert';
+
+        img.src = anchor_ele.querySelector('.songImg').src;
+        trackName.textContent = anchor_ele.querySelector('.albumName').textContent;
+
+        // append all Elements
+        queueThumb.appendChild(img);
+        a.append(queueThumb, trackName, removeBtn, moreOpt)
+        li.appendChild(a);
+        return li;
+    }
+
+    addPrevAndNext(event) {
+        const currQueue = this.queue.info.currQueue;
+        // check what's queue currently running
+        if (currQueue != null) {
+            const currIndex = this.queue.info.currIndex;
+            console.log(this.queue[currQueue], currIndex);
+            console.log(this.queue[currQueue][currIndex]);
+            if (typeof this.queue[currQueue][currIndex] != undefined) {
+                const nextSong = this.queue[currQueue][currIndex + 1];
+                console.log(nextSong)
+                this.audio.src = `./assets/data/${nextSong}`;
+                this.audio.load();
+                this.musicStateChange();
+
+            } else {
+                console.log('else Part')
+            }
         }
     }
 }

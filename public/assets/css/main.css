@@ -40,8 +40,7 @@ header {
 .queuePanel {
     position: fixed;
     top: 50px;
-    left: 0px;
-    /* left: -100px; */
+    left: -100px;
     width: 350px;
     height: calc(100vh - 50px);
     background-color: #fff;
@@ -75,7 +74,7 @@ header {
 .queueHeader .loopQueue,
 .queueHeader .shuffleQueue,
 .queueHeader .favQueue,
-.queueHeader .queueList {
+.queueHeader .playlistBtn {
     font-size: 20px;
     padding: 2px;
     margin: 0px 5px;
@@ -354,7 +353,6 @@ footer .timeEvent {
 .listGroup.playlist .imgWrap:first-child::before {
     content: 'library_music';
     color: #1c74ce;
-    /* background-image: url(../images/folder.png); */
     padding-left: 6px;
     padding-bottom: 6px;
     font-size: 20px;
@@ -362,7 +360,6 @@ footer .timeEvent {
 
 .listGroup.tracks .imgWrap:first-child::before {
     content: 'audiotrack';
-    /* background-image: url(../images/music.png); */
 }
 
 .listGroup .imgWrap:hover::before {
@@ -374,11 +371,9 @@ footer .timeEvent {
     content: '';
     visibility: visible;
     opacity: 1;
-    padding: 3px;
-    font-size: 19px;
+    padding: 4px;
+    font-size: 22px;
     color: #000;
-    width: 32px;
-    height: 32px;
     top: -50px;
     right: -50px;
     z-index: 10;
@@ -514,7 +509,8 @@ a {
 
 .myFav,
 .favPlaylist,
-.closeBtn {
+.closeBtn,
+.addToQueue {
     visibility: hidden;
     opacity: 0;
     cursor: pointer;
@@ -526,20 +522,16 @@ a {
 
 .imgWrap.active .myFav,
 .imgWrap.active .favPlaylist,
-.imgWrap.active .closeBtn {
+.imgWrap.active .closeBtn,
+.imgWrap.active .addToQueue {
     visibility: visible;
     opacity: 1;
 }
 
-.myFav::after {
-    content: 'favorite';
-}
-.favPlaylist::after {
-    content: 'playlist_add';
-}
-.closeBtn::after {
-    content: 'cancel';
-}
+.myFav::after {content: 'favorite';}
+.favPlaylist::after {content: 'playlist_add';}
+.closeBtn::after {content: 'cancel';}
+.addToQueue::after {content: 'queue';}
 
 .imgWrap .closeBtn {
     position: absolute;
@@ -554,14 +546,15 @@ a {
 }
 
 .imgWrap .myFav,
-.imgWrap .favPlaylist {
+.imgWrap .favPlaylist,
+.imgWrap .addToQueue {
     margin: 10px;
-    padding: 2px;
     color: #dc292a;
-    font-size: 44px;
+    font-size: 38px;
 }
 
-.imgWrap .favPlaylist {
+.imgWrap .favPlaylist,
+.imgWrap .addToQueue  {
     color: #000;
 }
 
