@@ -155,6 +155,19 @@ class MusicApp {
             this.audio.dataset.imgSrc = blobImg;
             this.audio.title = musicName.match(/\/(.*)\.mp3$/)[1].replace(/-/g, ' ');
             this.audio.src = `./assets/data/${musicName}`;
+
+
+            // let socket = io('/');
+            var socket = io.connect('http://localhost:8080/');
+            socket.emit('message', 'Aman Khan Silawat');
+            
+            socket.on('message', (USERID) => {
+                console.log('front end', USERID);
+            });
+
+            
+
+
             this.musicStateChange();
             this.addToQueue(e, true);
         }
@@ -193,7 +206,6 @@ class MusicApp {
 
     musicStateChange() {
         this.audio.play().then(() => {
-            console.log('playingggggggggggggggggggggg')
             this.audioDuration = this.audio.duration;
 
             // set time and progress bar
@@ -343,9 +355,9 @@ class MusicApp {
         if ('tracklist' in anchor_ele.dataset) {
             // append queue in queue list
             this.queue.queueList.appendChild(this.queue_track(anchor_ele));
-            
+
             // add info current PLAYING track in Queue
-            if (curr_play_state ==  true) {
+            if (curr_play_state == true) {
                 const trackPath = anchor_ele.dataset['tracklist'];
                 const getIndex = this.queue.default.push(trackPath);
                 this.queue.info.currQueue = 'default';

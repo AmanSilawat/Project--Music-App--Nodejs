@@ -61,15 +61,13 @@ const utils = {
     },
 
     getUnknow(musicDir, dataset) {
-        let url = dataset.split('/').map((el) => el.replace(/ /g, '-'));
-        console.log(dataset);
-        console.log(url);
+        const url = dataset.split('/').map((el) => el.replace(/ /g, '-'));
         let musicTree = musicDir;
 
         let i = 0;
         let popedVal = url.shift();
         while (musicTree.length > i) {
-            let trimed = musicTree[i].name.replace(/ /g, '-');
+            const trimed = musicTree[i].name.replace(/ /g, '-');
 
             if (trimed == popedVal) {
                 if (url.length == 0) {

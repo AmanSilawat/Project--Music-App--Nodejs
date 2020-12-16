@@ -23,10 +23,14 @@
     "prettier": "^2.2.0"
   },
   "dependencies": {
+    "body-parser": "^1.19.0",
     "child_process": "^1.0.2",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
-    "pug": "^3.0.0"
+    "fs-js-client": "^1.0.3",
+    "pug": "^3.0.0",
+    "socket.io": "^3.0.4",
+    "socket.io-stream": "^0.9.1"
   },
   "repository": {
     "type": "git",
