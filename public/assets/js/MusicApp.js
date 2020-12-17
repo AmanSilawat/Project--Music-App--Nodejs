@@ -156,20 +156,53 @@ class MusicApp {
             this.audio.title = musicName.match(/\/(.*)\.mp3$/)[1].replace(/-/g, ' ');
             this.audio.src = `./assets/data/${musicName}`;
 
+            console.dir(this.audio);
 
-            // let socket = io('/');
-            var socket = io.connect('http://localhost:8080/');
-            socket.emit('message', 'Aman Khan Silawat');
-            
-            socket.on('message', (USERID) => {
-                console.log('front end', USERID);
-            });
+            // abc();
+            // function abc() {
+            //     // let socket = io('/');
+            //     let socket = io.connect('http://localhost:8080/');
+            //     socket.emit('message', 'Aman Khan Silawat');
 
-            
+            //     socket.on('message', (encodedData) => {
+            //         // const buffer = new ArrayBuffer(encodedData);
+            //         // console.log(buffer.toString('base64'));
+            //         // var text = "Example text to appear on clipboard";
+            //         navigator.clipboard.writeText(encodedData).then(function () {
+            //             console.log('Async: Copying to clipboard was successful!');
+            //         }, function (err) {
+            //             console.error('Async: Could not copy text: ', err);
+            //         });
+
+            //     });
+            // }
 
 
-            this.musicStateChange();
-            this.addToQueue(e, true);
+
+            // song();
+            async function song() {
+                let response = await fetch('./assets/data/singer/owais-raza-qadri/nabi-ka-jashn-aya.mp3')
+                let arrayBuffer = await response.arrayBuffer();
+                console.log(arrayBuffer)
+
+                var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let source = audioCtx.createBufferSource();
+
+                audioCtx.decodeAudioData(arrayBuffer, function (buffer) {
+                    source.buffer = buffer;
+                    console.log(buffer);
+                    console.log(source);
+
+                    source.connect(audioCtx.destination);
+                    source.loop = true;
+                    // start the source playing
+                    source.start();
+                });
+            }
+
+
+            // this.musicStateChange();
+            // this.addToQueue(e, true);
         }
 
     }
