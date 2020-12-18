@@ -306,6 +306,11 @@ footer .timeEvent {
     transition: all 0.3s;
 }
 
+.queueThumb{
+    position: relative;
+}
+
+.queueThumb::after,
 .listGroup .imgWrap::after {
     content: 'play_circle_filled';
     position: absolute;
@@ -415,8 +420,8 @@ footer .timeEvent {
 
 .listGroup .imgWrap.active:before,
 .listGroup .imgWrap.active::after {
-    visibility: hidden !important;
-    opacity: 0 !important;
+    visibility: hidden;
+    opacity: 0;
 }
 
 .listGroup .listItem a {
@@ -516,8 +521,8 @@ a {
     cursor: pointer;
 }
 
-.closeBtn{
-    transition: all .7s;
+.closeBtn {
+    transition: all 0.7s;
 }
 
 .imgWrap.active .myFav,
@@ -528,10 +533,18 @@ a {
     opacity: 1;
 }
 
-.myFav::after {content: 'favorite';}
-.favPlaylist::after {content: 'playlist_add';}
-.closeBtn::after {content: 'cancel';}
-.addToQueue::after {content: 'queue';}
+.myFav::after {
+    content: 'favorite';
+}
+.favPlaylist::after {
+    content: 'playlist_add';
+}
+.closeBtn::after {
+    content: 'cancel';
+}
+.addToQueue::after {
+    content: 'queue';
+}
 
 .imgWrap .closeBtn {
     position: absolute;
@@ -554,10 +567,9 @@ a {
 }
 
 .imgWrap .favPlaylist,
-.imgWrap .addToQueue  {
+.imgWrap .addToQueue {
     color: #000;
 }
-
 
 /* shortView Of queue */
 .shortView {
@@ -567,7 +579,7 @@ a {
 .queueItem .trackName,
 .queueItem .removeBtn,
 .queueItem .moreOpt {
-    transition: all .1s;
+    transition: all 0.1s;
 }
 
 .queueItem.shortView .trackName,
@@ -576,3 +588,34 @@ a {
     visibility: hidden;
     opacity: 0;
 }
+
+/* acitve player */
+
+.playing .imgWrap {
+    border: 2px solid #efd152;
+}
+
+.playing .imgWrap:before{
+    visibility: hidden;
+    opacity: 0;
+}
+
+.playing .queueThumb::after{
+    font-size: 30px;
+}
+
+.playing .queueThumb::after,
+.playing .imgWrap::after {
+    visibility: visible !important;
+    opacity: 1 !important;
+    background-color: #4848488a;
+    color: #efd152;
+}
+
+.playing.queueItem .removeBtn{
+    visibility: hidden;
+    opacity: 0;
+}
+
+
+/* , .imgWrap .gridOpt */

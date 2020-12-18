@@ -21,9 +21,11 @@ class MusicAppView {
         this.el.listAnchor.classList.add('listAnchor');
         this.el.imgWrap.classList.add('imgWrap');
         this.el.songImg.classList.add('songImg');
+        this.el.songImg.classList.add('blobImg');
         this.el.songImg.src = './assets/images/loading.gif';
         this.el.songImg.alt = 'img';
         this.el.albumName.classList.add('albumName');
+        this.el.albumName.classList.add('gridHead');
 
         // extra variable
         this.prevPageDetail = prevPageDetail;

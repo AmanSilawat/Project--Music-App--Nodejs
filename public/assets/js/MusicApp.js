@@ -21,7 +21,8 @@ class MusicApp {
             musicThumbnil: document.getElementById('musicThumbnil'),
             playerPanel: document.querySelector('footer'),
             imgEff: document.getElementById('playerEff'),
-            listAnchor: document.querySelectorAll('a[data-img]')
+            listAnchor: document.querySelectorAll('a[data-img]'),
+            container: document.getElementById('container')
         };
         this.queue = {
             visibity: false,
@@ -104,6 +105,12 @@ class MusicApp {
         if (e.target.classList.contains('addToQueue') == true) {
             this.addToQueue(e);
         }
+
+        // remove to queue
+        if (e.target.classList.contains('removeBtn') == true) {
+            this.removeToQueue(e);
+        }
+
     }
 
     innerContent(e) {
@@ -137,72 +144,36 @@ class MusicApp {
     }
 
     // goto to parent element then search img
-    get_target_ancher(ePath) {
-        for (const ele of ePath) {
-            if (ele.tagName.toLowerCase() == 'a') {
+    get_target_ancher(ePath, findWhich) {
+        let bubblePath = Array.from(ePath);
+        for (const ele of bubblePath) {
+            if (ele.matches(findWhich) == true) {
                 return ele;
+            } else if (ele.tagName.toLowerCase() == 'body') {
+                return;
             }
         }
     }
 
     getSong(e) {
         let musicName = e.target.dataset.tracklist;
-        let ePath = Array.from(e.path);
-        let blobImg = this.get_target_ancher(ePath).querySelector('.songImg').src;
+        let anchorEle = this.get_target_ancher(e.path, 'a');
+        let blobImg = anchorEle.querySelector('.blobImg').src
 
         // set audio source info
         if (typeof musicName != 'undefined') {
             this.audio.dataset.imgSrc = blobImg;
-            this.audio.title = musicName.match(/\/(.*)\.mp3$/)[1].replace(/-/g, ' ');
+            this.audio.title = musicName.match(/([\w-]+)\.mp3$/)[1].replace(/-/g, ' ');
             this.audio.src = `./assets/data/${musicName}`;
-
-            console.dir(this.audio);
-
-            // abc();
-            // function abc() {
-            //     // let socket = io('/');
-            //     let socket = io.connect('http://localhost:8080/');
-            //     socket.emit('message', 'Aman Khan Silawat');
-
-            //     socket.on('message', (encodedData) => {
-            //         // const buffer = new ArrayBuffer(encodedData);
-            //         // console.log(buffer.toString('base64'));
-            //         // var text = "Example text to appear on clipboard";
-            //         navigator.clipboard.writeText(encodedData).then(function () {
-            //             console.log('Async: Copying to clipboard was successful!');
-            //         }, function (err) {
-            //             console.error('Async: Could not copy text: ', err);
-            //         });
-
-            //     });
-            // }
-
-
-
-            // song();
-            async function song() {
-                let response = await fetch('./assets/data/singer/owais-raza-qadri/nabi-ka-jashn-aya.mp3')
-                let arrayBuffer = await response.arrayBuffer();
-                console.log(arrayBuffer)
-
-                var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                let source = audioCtx.createBufferSource();
-
-                audioCtx.decodeAudioData(arrayBuffer, function (buffer) {
-                    source.buffer = buffer;
-                    console.log(buffer);
-                    console.log(source);
-
-                    source.connect(audioCtx.destination);
-                    source.loop = true;
-                    // start the source playing
-                    source.start();
-                });
+            this.audio.muted = true;
+            let nodeEle = this.el.container.querySelector('.playing')
+            if(nodeEle != null) {
+                nodeEle.classList.remove('playing')
             }
+            anchorEle.classList.add('playing');
 
-
-            // this.musicStateChange();
-            // this.addToQueue(e, true);
+            this.musicStateChange();
+            this.addToQueue(e, true);
         }
 
     }
@@ -288,12 +259,6 @@ class MusicApp {
                 clearInterval(this.audioInterval);
             }
         }
-    }
-
-    changeAudioInfo() {
-        // change album name & img 
-
-        // move music duration this place
     }
 
     // drag and drop function
@@ -384,53 +349,106 @@ class MusicApp {
 
     // add to queue
     addToQueue(e, curr_play_state = false) {
-        const anchor_ele = this.get_target_ancher(Array.from(e.path));
+        const anchor_ele = this.get_target_ancher(e.path, 'a');
         if ('tracklist' in anchor_ele.dataset) {
             // append queue in queue list
-            this.queue.queueList.appendChild(this.queue_track(anchor_ele));
+            let isMusicNode = this.queue_track(anchor_ele);
+            if (isMusicNode !== false) {
+                // find & removing playing class
+                let isContain = this.queue.queueList.querySelector('.playing')
 
-            // add info current PLAYING track in Queue
-            if (curr_play_state == true) {
-                const trackPath = anchor_ele.dataset['tracklist'];
-                const getIndex = this.queue.default.push(trackPath);
-                this.queue.info.currQueue = 'default';
-                this.queue.info.currIndex = getIndex - 1;
-            } else {
-                const trackPath = anchor_ele.dataset['tracklist'];
-                this.queue.default.push(trackPath);
+                if (isContain != null) {
+                    isContain.classList.remove('playing');
+                }
+                this.queue.queueList.appendChild(isMusicNode);
+
+                // add info current PLAYING track in Queue
+                if (curr_play_state == true) {
+                    const trackPath = anchor_ele.dataset['tracklist'];
+                    const getIndex = this.queue.default.push(trackPath);
+                    this.queue.info.currQueue = 'default';
+                    this.queue.info.currIndex = getIndex - 1;
+                } else {
+                    const trackPath = anchor_ele.dataset['tracklist'];
+                    this.queue.default.push(trackPath);
+                }
             }
         }
     }
 
+    // revove to queue
+    removeToQueue(e) {
+        let queueItem = e.target.dataset.tracklist;
+        
+        // remove on DOM
+        let rootMusicEl = this.get_target_ancher(e.path, 'li.rowTrack');
+        rootMusicEl.remove();
+
+        if (
+            rootMusicEl.firstElementChild.classList.contains('playing') == true &&
+            this.queue.default.length != 0
+        ) {
+            console.log(true);
+            this.queue.queueList.querySelector('.rowTrack').firstElementChild.classList.add('playing')
+            this.queue.queueList.querySelector('.rowTrack').firstElementChild.click();
+        }
+        
+        
+        // remove on queue
+        let indexPos = this.queue[this.queue.info.currQueue].indexOf(queueItem);
+        this.queue[this.queue.info.currQueue].splice(indexPos, 1);
+    }
+
     queue_track(anchor_ele) {
-        // create elements
-        const li = document.createElement('li');
-        const a = document.createElement('a');
-        const queueThumb = document.createElement('div');
-        const img = document.createElement('img');
-        const trackName = document.createElement('div');
-        const removeBtn = document.createElement('div');
-        const moreOpt = document.createElement('div');
+        let musicPath = anchor_ele.dataset.tracklist;
 
-        // set info in elements
-        li.className += 'rowTrack';
-        a.className += 'queueItem';
-        a.href = 'javascript:void(0)';
-        queueThumb.className += 'queueThumb';
-        trackName.className += 'trackName';
-        removeBtn.className += 'removeBtn material-icons';
-        moreOpt.className += 'moreOpt material-icons';
-        removeBtn.textContent = 'close';
-        moreOpt.textContent = 'more_vert';
+        let currQue = this.queue.info.currQueue;
+        if (currQue == null) {
+            return addMusicNode(musicPath)
+        } else if (this.queue[currQue].includes(musicPath) != true) {
+            return addMusicNode(musicPath);
+        }
 
-        img.src = anchor_ele.querySelector('.songImg').src;
-        trackName.textContent = anchor_ele.querySelector('.albumName').textContent;
+        // add music node
+        function addMusicNode() {
+            // create elements
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            const queueThumb = document.createElement('div');
+            const img = document.createElement('img');
+            const trackName = document.createElement('div');
+            const removeBtn = document.createElement('div');
+            const moreOpt = document.createElement('div');
 
-        // append all Elements
-        queueThumb.appendChild(img);
-        a.append(queueThumb, trackName, removeBtn, moreOpt)
-        li.appendChild(a);
-        return li;
+            // set info in elements
+            li.className += 'rowTrack';
+            a.className += 'queueItem playing';
+            a.href = 'javascript:void(0)';
+            queueThumb.className += 'queueThumb material-icons';
+            trackName.className += 'trackName gridHead';
+            removeBtn.className += 'removeBtn material-icons';
+            img.className += 'blobImg';
+            moreOpt.className += 'moreOpt material-icons';
+            removeBtn.textContent = 'close';
+            moreOpt.textContent = 'more_vert';
+
+            // set dataset hasAttribute
+            li.dataset.tracklist = musicPath;
+            a.dataset.tracklist = musicPath;
+            queueThumb.dataset.tracklist = musicPath;
+            img.dataset.tracklist = musicPath;
+            trackName.dataset.tracklist = musicPath;
+
+            img.src = anchor_ele.querySelector('.blobImg').src;
+            trackName.textContent = anchor_ele.querySelector('.gridHead').textContent;
+
+            // append all Elements
+            queueThumb.appendChild(img);
+            a.append(queueThumb, trackName, removeBtn, moreOpt)
+            li.appendChild(a);
+            return li;
+        }
+        return false;
     }
 
     addPrevAndNext(event) {

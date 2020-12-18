@@ -18,40 +18,12 @@ app.get('/getData', function getDa(req, res) {
     Utils.getDirData(res).then((response) => res.send(response.children));
 });
 
-io.on('connection', (socket) => {
-
-    // let strData = '';
-    socket.on('message', (socket) => {
-        console.log('connection established');
-
-        var readStream = fs.createReadStream(("./public/assets/data/singer/owais-raza-qadri/nabi-ka-jashn-aya.mp3"), {
-            'encoding': null
-        });
-
-        // let data = '';
-        readStream.on('data', function (data) {
-            io.emit('message', {
-                buffer: data
-            });
-        });
-
-        // // var readStream = fs.createReadStream("./public/assets/data/singer/owais-raza-qadri/nabi-ka-jashn-aya.mp3",
-        //     {
-        //         'flags': 'r',
-        //         'encoding': 'binary',
-        //         'mode': 0666,
-        //         'bufferSize': 64 * 1024
-        //     });
-        // readStream.on('data', function (data) {
-        // console.log(typeof data);
-        // console.log('sending chunk of data')
-        // socket.send(data);
-        // io.emit('message', data);
-        // strData += data;
-        // });
-        // readStream.on('end', function lastData() {
-        //     io.emit('message', strData);
-        // });
+io.on('connection', function (socket) {
+    socket.on('client-stream-request', function (data) {
+        var stream = ss.createStream();
+        var filename = "./public/assets/data/singer/owais-raza-qadri/nabi-ka-jashn-aya.mp3";
+        ss(socket).emit('audio-stream', stream, { name: filename });
+        fs.createReadStream(filename).pipe(stream);
     });
 });
 
