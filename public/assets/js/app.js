@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', async function musicDirData(params
 });
 
 
-
 // ! demo show all buffer data
 // let socket = io.connect('http://localhost:8080/');
 // var audioContext = new (window.AudioContext || window.webkitAudioContext)();

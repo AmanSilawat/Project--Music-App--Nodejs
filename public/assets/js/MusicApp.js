@@ -24,19 +24,8 @@ class MusicApp {
             listAnchor: document.querySelectorAll('a[data-img]'),
             container: document.getElementById('container')
         };
-        this.queue = {
-            visibity: false,
-            info: {
-                currQueue: null,
-                currIndex: null
-            },
-            default: [],
-            favorite: [],
-            playlist: [],
-            root: document.querySelector('.queuePanel'),
-            queueList: document.querySelector('.queueList')
-        }
-        this.init();
+        this.queue = null,
+            this.init();
     }
 
     init() {
@@ -47,6 +36,19 @@ class MusicApp {
         this.deagNDrop();
 
         this.audio.addEventListener('ended', (event) => this.addPrevAndNext(event));
+
+        // load queue class after loading
+        let x = new Promise((resolve, reject) => {
+            let queue = import('./Queue.js').then((data) => new data.default(this));
+            resolve(queue);
+            reject();
+        });
+
+        x.then((queueInstance) => {
+            this.queue = queueInstance;
+        }).catch((reject) => {
+            throw `Queue file doesn't load Error: ${reject}`;
+        });
     }
 
     eventListener() {
@@ -66,10 +68,6 @@ class MusicApp {
         this.el.audioTrackWrap.addEventListener('click', function (e) {
             this.seekingAudio(e.x, 'drop');
         }.bind(this));
-
-        // Mouse Over on Queue bar
-        this.queue.root.addEventListener('mouseenter', (event) => this.toggleQueueBar(event, 'focus_in'));
-        this.queue.root.addEventListener('mouseleave', (event) => this.toggleQueueBar(event, 'focus_out'));
     }
 
     eventHandler(e) {
@@ -103,14 +101,28 @@ class MusicApp {
 
         // add to queue
         if (e.target.classList.contains('addToQueue') == true) {
-            this.addToQueue(e);
+            const config = {
+                event: e,
+                appendNPlay: false,
+                queueType: 'default'
+            }
+            this.queue.addToQueue(config);
         }
 
         // remove to queue
         if (e.target.classList.contains('removeBtn') == true) {
-            this.removeToQueue(e);
+            this.queue.removeToQueue(e);
         }
 
+        // add to favorite queue
+        if (e.target.classList.contains('favQueue') == true) {
+            this.queue.toggleToFav(e);
+        }
+
+        // add to favorite queue
+        if (e.target.classList.contains('myFav') == true) {
+            this.queue.addToFavQueue(e);
+        }
     }
 
     innerContent(e) {
@@ -156,24 +168,32 @@ class MusicApp {
     }
 
     getSong(e) {
-        let musicName = e.target.dataset.tracklist;
-        let anchorEle = this.get_target_ancher(e.path, 'a');
-        let blobImg = anchorEle.querySelector('.blobImg').src
+        const config = {
+            event: e,
+            appendNPlay: true,
+            queueType: 'default'
+        }
+        let changeMusic = this.queue.addToQueue(config);
+        switch (changeMusic) {
+            case 'chnageMusic':
+                let musicName = e.target.dataset.tracklist;
+                let anchorEle = this.get_target_ancher(e.path, 'a');
+                let blobImg = anchorEle.querySelector('.blobImg').src
 
-        // set audio source info
-        if (typeof musicName != 'undefined') {
-            this.audio.dataset.imgSrc = blobImg;
-            this.audio.title = musicName.match(/([\w-]+)\.mp3$/)[1].replace(/-/g, ' ');
-            this.audio.src = `./assets/data/${musicName}`;
-            this.audio.muted = true;
-            let nodeEle = this.el.container.querySelector('.playing')
-            if(nodeEle != null) {
-                nodeEle.classList.remove('playing')
-            }
-            anchorEle.classList.add('playing');
+                // set audio source info
+                if (typeof musicName != 'undefined') {
+                    this.audio.dataset.imgSrc = blobImg;
+                    this.audio.title = musicName.match(/([\w-]+)\.mp3$/)[1].replace(/-/g, ' ');
+                    this.audio.src = `./assets/data/${musicName}`;
 
-            this.musicStateChange();
-            this.addToQueue(e, true);
+                    anchorEle.classList.add('playing');
+                    this.musicStateChange()
+                }
+                break;
+
+            case 'onlyPlayPause':
+                this.playPause();
+                break;
         }
 
     }
@@ -225,7 +245,7 @@ class MusicApp {
                 let main = document.querySelector('.main');
                 this.queue.visibity = true;
                 this.el.playerPanel.classList.add('activePlayer');
-                this.queue.root.classList.add('activePlayer');
+                this.queue.el.root.classList.add('activePlayer');
                 main.classList.add('activePlayer');
             }
 
@@ -330,125 +350,6 @@ class MusicApp {
             default:
                 break;
         }
-    }
-
-    toggleQueueBar(e, focus_type) {
-        switch (focus_type) {
-            case 'focus_in':
-                this.queue.root.classList.remove('shortView')
-                break;
-
-            case 'focus_out':
-                this.queue.root.classList.add('shortView')
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    // add to queue
-    addToQueue(e, curr_play_state = false) {
-        const anchor_ele = this.get_target_ancher(e.path, 'a');
-        if ('tracklist' in anchor_ele.dataset) {
-            // append queue in queue list
-            let isMusicNode = this.queue_track(anchor_ele);
-            if (isMusicNode !== false) {
-                // find & removing playing class
-                let isContain = this.queue.queueList.querySelector('.playing')
-
-                if (isContain != null) {
-                    isContain.classList.remove('playing');
-                }
-                this.queue.queueList.appendChild(isMusicNode);
-
-                // add info current PLAYING track in Queue
-                if (curr_play_state == true) {
-                    const trackPath = anchor_ele.dataset['tracklist'];
-                    const getIndex = this.queue.default.push(trackPath);
-                    this.queue.info.currQueue = 'default';
-                    this.queue.info.currIndex = getIndex - 1;
-                } else {
-                    const trackPath = anchor_ele.dataset['tracklist'];
-                    this.queue.default.push(trackPath);
-                }
-            }
-        }
-    }
-
-    // revove to queue
-    removeToQueue(e) {
-        let queueItem = e.target.dataset.tracklist;
-        
-        // remove on DOM
-        let rootMusicEl = this.get_target_ancher(e.path, 'li.rowTrack');
-        rootMusicEl.remove();
-
-        if (
-            rootMusicEl.firstElementChild.classList.contains('playing') == true &&
-            this.queue.default.length != 0
-        ) {
-            console.log(true);
-            this.queue.queueList.querySelector('.rowTrack').firstElementChild.classList.add('playing')
-            this.queue.queueList.querySelector('.rowTrack').firstElementChild.click();
-        }
-        
-        
-        // remove on queue
-        let indexPos = this.queue[this.queue.info.currQueue].indexOf(queueItem);
-        this.queue[this.queue.info.currQueue].splice(indexPos, 1);
-    }
-
-    queue_track(anchor_ele) {
-        let musicPath = anchor_ele.dataset.tracklist;
-
-        let currQue = this.queue.info.currQueue;
-        if (currQue == null) {
-            return addMusicNode(musicPath)
-        } else if (this.queue[currQue].includes(musicPath) != true) {
-            return addMusicNode(musicPath);
-        }
-
-        // add music node
-        function addMusicNode() {
-            // create elements
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            const queueThumb = document.createElement('div');
-            const img = document.createElement('img');
-            const trackName = document.createElement('div');
-            const removeBtn = document.createElement('div');
-            const moreOpt = document.createElement('div');
-
-            // set info in elements
-            li.className += 'rowTrack';
-            a.className += 'queueItem playing';
-            a.href = 'javascript:void(0)';
-            queueThumb.className += 'queueThumb material-icons';
-            trackName.className += 'trackName gridHead';
-            removeBtn.className += 'removeBtn material-icons';
-            img.className += 'blobImg';
-            moreOpt.className += 'moreOpt material-icons';
-            removeBtn.textContent = 'close';
-            moreOpt.textContent = 'more_vert';
-
-            // set dataset hasAttribute
-            li.dataset.tracklist = musicPath;
-            a.dataset.tracklist = musicPath;
-            queueThumb.dataset.tracklist = musicPath;
-            img.dataset.tracklist = musicPath;
-            trackName.dataset.tracklist = musicPath;
-
-            img.src = anchor_ele.querySelector('.blobImg').src;
-            trackName.textContent = anchor_ele.querySelector('.gridHead').textContent;
-
-            // append all Elements
-            queueThumb.appendChild(img);
-            a.append(queueThumb, trackName, removeBtn, moreOpt)
-            li.appendChild(a);
-            return li;
-        }
-        return false;
     }
 
     addPrevAndNext(event) {
