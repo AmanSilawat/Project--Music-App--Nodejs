@@ -642,7 +642,7 @@ a {
     top: 0;
 }
 
-.favWrap {
+.favoriteWrap {
     left: 500px;
     top: 0px;
 }
@@ -652,11 +652,11 @@ a {
     left: -500px;
 }
 
-.favoriteActive .favWrap {
+.favoriteActive .favoriteWrap {
     left: 0px;
 }
 
-.favWrap .defaultView {
+.favoriteWrap .defaultView {
     text-align: center;
     margin-top: 16px;
     font-size: 20px;
