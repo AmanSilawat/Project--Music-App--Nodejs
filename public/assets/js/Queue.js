@@ -2,9 +2,9 @@ class Queue {
     constructor(musicAppInstance) {
         this.musicApp = musicAppInstance;
         this.el = {
-            mainActive: null,
-            defaultActive: null,
-            favoriteActive: null,
+            playingElBody: null,
+            playingElDefaultQueue: null,
+            playingElFavoriteQueue: null,
             playlistActive: null,
             root: document.querySelector('.queuePanel'),
             defaultWrap: document.querySelector('.queueList'),
@@ -63,7 +63,7 @@ class Queue {
         const anchor_ele = this.musicApp.get_target_ancher(config.event.path, 'a');
         const state = this.queueValidation(config, anchor_ele);
         if (state == 'onlyPlayPause') {
-            console.log('trueeeee');
+            // console.log('trueeeee');
         }
         return state;
     }
@@ -95,7 +95,7 @@ class Queue {
 
                 // usefull for other queues/
                 if (config.appendNPlay == true) {
-                    this.changeActiveState(anchor_ele, isMusicNode.firstChild);
+                    this.changeActiveState(config.queueType, anchor_ele, isMusicNode.firstChild);
 
                     // remove playing class previes element and add current element
                     if (config.queueType == 'default') {
@@ -128,7 +128,7 @@ class Queue {
                 this.el.root.querySelector(`a[data-tracklist="${anchor_ele.dataset['tracklist']}"]`);
 
             // remove playing class previes element and add current element
-            this.changeActiveState(mainNode, queueNode);
+            this.changeActiveState(config.queueType, mainNode, queueNode);
             return 'chnageMusic'; // change music
         }
     }
@@ -154,19 +154,46 @@ class Queue {
     }
 
     // remove active playing class
-    changeActiveState(mainNode, queueNode) {
-        // remove playing class previes element
-        if (this.el.mainActive != null) {
-            this.el.mainActive.classList.remove('playing');
-            this.el.defaultActive.classList.remove('playing');
+    changeActiveState(queueType, mainNode, queueNode) {
+        // remove playing class all placeses
+        console.log(queueType);
+        if (this.el.playingElBody != null) {
+            this.el.playingElBody.classList.remove('playing');
+
+            // console.log(this.el.playingElDefaultQueue);
+            // console.log(this.el.playingElFavoriteQueue);
+            if (
+                this.el.playingElDefaultQueue != null &&
+                queueType == 'default'
+            ) {
+                console.log('if');
+                this.el.playingElDefaultQueue.classList.remove('playing');
+            } else if (
+                this.el.playingElFavoriteQueue != null &&
+                queueType == 'favorite'
+            ) {
+                console.log('else');
+                this.el.playingElFavoriteQueue.classList.remove('playing');
+            }
         }
         // add playing Element in queue
-        this.el.mainActive = mainNode;
-        this.el.defaultActive = queueNode;
+        this.el.playingElBody = mainNode;
+        this.el.playingElBody.classList.add('playing');
 
         // add playing class in active   queue
-        this.el.mainActive.classList.add('playing');
-        this.el.defaultActive.classList.add('playing');
+        if (queueType == 'default') {
+            this.el.playingElDefaultQueue = queueNode;
+        } else if (queueType == 'favorite') {
+            this.el.playingElFavoriteQueue = queueNode;
+        }
+
+        if (this.default.includes(queueNode.dataset.tracklist)) {
+            this.el.playingElDefaultQueue.classList.add('playing');
+        }
+
+        if (this.favorite.includes(queueNode.dataset.tracklist)) {
+            this.el.playingElFavoriteQueue.classList.add('playing');
+        }
     }
 
     // Create Queue row Wrapper Element
@@ -183,7 +210,7 @@ class Queue {
 
         // set info in elements
         li.className += 'rowTrack';
-        a.className += 'queueItem';
+        a.className += 'queueItem commDef';
         a.href = 'javascript:void(0)';
         queueThumb.className += 'queueThumb material-icons';
         trackName.className += 'trackName gridHead';

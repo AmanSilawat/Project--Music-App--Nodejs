@@ -74,7 +74,7 @@ class MusicApp {
         e.preventDefault();
 
         if (e.target.hasAttribute('data-tracklist') == true) {
-            this.getSong(e)
+            this.getSong(e);
         }
 
         if (e.target.hasAttribute('data-img') == true) {
@@ -168,16 +168,29 @@ class MusicApp {
     }
 
     getSong(e) {
+        let anchorEle = this.get_target_ancher(e.path, 'a');
+        
+        // same song play in multiple queue
+        let uniqeKey = this.get_target_ancher(e.path, '.uniqeKey');
+        let queueType;
+
+        if (uniqeKey.classList.contains('listAnchor') == true) {
+            queueType = 'default';
+        } else if (uniqeKey.classList.contains('defaultWrap') == true) {
+                queueType = 'default';
+        } else if (uniqeKey.classList.contains('favoriteWrap') == true) {
+            queueType = 'favorite';
+        }
         const config = {
             event: e,
             appendNPlay: true,
-            queueType: 'default'
+            queueType: queueType
         }
         let changeMusic = this.queue.addToQueue(config);
         switch (changeMusic) {
             case 'chnageMusic':
                 let musicName = e.target.dataset.tracklist;
-                let anchorEle = this.get_target_ancher(e.path, 'a');
+                // let anchorEle = this.get_target_ancher(e.path, 'a'); // changeeeeeeeeeeeeeeeeeeeeeeeeeee
                 let blobImg = anchorEle.querySelector('.blobImg').src
 
                 // set audio source info

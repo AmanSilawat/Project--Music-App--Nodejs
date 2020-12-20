@@ -19,6 +19,8 @@ class MusicAppView {
         this.el.listGrid.classList.add('listGrid');
         this.el.listItem.classList.add('listItem');
         this.el.listAnchor.classList.add('listAnchor');
+        this.el.listAnchor.classList.add('uniqeKey');
+        this.el.listAnchor.classList.add('commDef');
         this.el.imgWrap.classList.add('imgWrap');
         this.el.songImg.classList.add('songImg');
         this.el.songImg.classList.add('blobImg');
