@@ -8,7 +8,8 @@ class Queue {
             playlistActive: null,
             root: document.querySelector('.queuePanel'),
             defaultWrap: document.querySelector('.queueList'),
-            favoriteWrap: document.querySelector('.favoriteWrap')
+            favoriteWrap: document.querySelector('.favoriteWrap'),
+            playlistWrap: document.querySelector('.playlistWrap')
         };
         this.visibity = false;
         this.playInfo = {
@@ -99,10 +100,10 @@ class Queue {
 
                     this.playInfo.currIndex = getIndex - 1;
                 } else {
-                    this.changeActiveState(config.queueType, anchor_ele, isMusicNode.firstChild);
+                    this.changeActiveState(config, anchor_ele, isMusicNode.firstChild);
                     return; // nothing do any thing
                 }
-                this.changeActiveState(config.queueType, anchor_ele, isMusicNode.firstChild);
+                this.changeActiveState(config, anchor_ele, isMusicNode.firstChild);
                 return 'chnageMusic';
             } else {
                 if (config.queueType == 'default') {
@@ -121,7 +122,7 @@ class Queue {
                                 this.el.root.querySelector(`a[data-tracklist="${anchor_ele.dataset['tracklist']}"]`);
 
                             // remove playing class previes element and add current element
-                            this.changeActiveState(config.queueType, mainNode, queueNode);
+                            this.changeActiveState(config, mainNode, queueNode);
                             return 'chnageMusic'; // change music
                         }
                         // alert("It's already added!")
@@ -133,7 +134,7 @@ class Queue {
                         anchor_ele.classList.contains('commDef') != true &&
                         anchor_ele.classList.contains('playing') != true
                     ) {
-                        this.changeActiveState(config.queueType, mainNode, queueNode);
+                        this.changeActiveState(config, mainNode, queueNode);
                         return 'chnageMusic';
                     } else if (anchor_ele.classList.contains('playing') == true) {
                         return 'onlyPlayPause';
@@ -169,8 +170,10 @@ class Queue {
     }
 
     // remove active playing class
-    changeActiveState(queueType, mainNode, queueNode) {
+    changeActiveState(config, mainNode, queueNode) {
+        // if (config.isPlay == true) {
         // remove playing class to all placeses
+        console.log(queueNode);
         if (this.el.playingElBody != null) {
             this.el.playingElBody.classList.remove('playing');
 
@@ -180,7 +183,7 @@ class Queue {
             if (defaultWrapEl != null) {
                 defaultWrapEl.classList.remove('playing')
             }
-            
+
             if (favoriteWrapEl != null) {
                 favoriteWrapEl.classList.remove('playing')
             }
@@ -196,10 +199,11 @@ class Queue {
         if (defaultWrapEl != null) {
             defaultWrapEl.classList.add('playing')
         }
-        
+
         if (favoriteWrapEl != null) {
             favoriteWrapEl.classList.add('playing')
         }
+        // }
     }
 
     // Create Queue row Wrapper Element
@@ -249,12 +253,25 @@ class Queue {
     }
 
     // Add to favorite Queue
-    toggleToFav(e) {
-        this.el.root.classList.toggle('favoriteActive');
+    toggleToFav(e, type) {
+        switch (type) {
+            case 'favorite':
+                this.el.root.classList.toggle('favoriteActive');
+                this.el.root.classList.remove('playlistActive');
+                break;
+
+            case 'playlist':
+                this.el.root.classList.toggle('playlistActive');
+                this.el.root.classList.remove('favoriteActive');
+                break;
+
+            default:
+                break;
+        }
     }
 
     addToFavQueue(e) {
-        let defaultViewNode = this.el.favoriteWrap.querySelector('.defaultView')
+        let defaultViewNode = this.el.favoriteWrap.querySelector('.defaultView');
         if (defaultViewNode != null) {
             defaultViewNode.remove();
         }
@@ -264,6 +281,76 @@ class Queue {
             queueType: 'favorite'
         }
         this.addToQueue(config);
+    }
+
+    addToPlaylistQueue(e) {
+        let defaultViewNode = this.el.playlistWrap.querySelector('.defaultView');
+        const anchor_ele = this.musicApp.get_target_ancher(e.path, 'a');
+        if (defaultViewNode != null) {
+            defaultViewNode.remove();
+        }
+        const config = {
+            event: e,
+            isPlay: false,
+            queueType: 'playlist'
+        }
+        // get info to anchor tag
+
+        if (anchor_ele.dataset.img == undefined) {
+            const track = anchor_ele.dataset.tracklist;
+            // this.addToQueue(config);
+        } else {
+            const tracks = this.getMusicTracks(anchor_ele);
+            console.log(tracks);
+        }
+        
+        
+    }
+
+    getMusicTracks(anchor_ele) {
+        const testData = anchor_ele.dataset.img.split('/');
+        const data = this.musicApp.musicAppViewInstance.musicDir;
+        const cloneData = JSON.parse(JSON.stringify(data));
+
+        // get current position array of object
+        function findDir(data, testData) {
+            if (testData.length == 0) {
+                return data;
+            }
+            let element = testData[0];
+
+            if (data.length != 0) {
+                let firstEle = data.shift();
+                if (firstEle.name == element) {
+                    testData.shift()
+                    return findDir(firstEle.children, testData);
+                }
+                return findDir(data, testData);
+            }
+        }
+
+        // get all tracks
+        function tracks(currDir, arr = []) {
+            if (currDir.length == 0) {
+                return arr;
+            }
+            let firstEle = currDir.shift();
+
+            if (firstEle.type == 'folder') {
+                currDir.push(firstEle.children)
+                return tracks(currDir, arr);
+            } else {
+                try {
+                    arr.push(...firstEle[0].tracks);
+                } catch (error) {
+                    arr.push(...firstEle.tracks);
+                }
+            }
+            return tracks(currDir, arr);
+        }
+
+        let currDir = findDir(cloneData, testData);
+        return tracks(JSON.parse(JSON.stringify(currDir)));
     }
 }
 export default Queue;

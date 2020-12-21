@@ -114,14 +114,24 @@ class MusicApp {
             this.queue.removeToQueue(e);
         }
 
-        // add to favorite queue
+        // show to favorite queue
         if (e.target.classList.contains('favQueue') == true) {
-            this.queue.toggleToFav(e);
+            this.queue.toggleToFav(e, 'favorite');
+        }
+
+        // show to playlist queue
+        if (e.target.classList.contains('playlistBtn') == true) {
+            this.queue.toggleToFav(e, 'playlist');
         }
 
         // add to favorite queue
         if (e.target.classList.contains('myFav') == true) {
             this.queue.addToFavQueue(e);
+        }
+
+        // add to playlist queue
+        if (e.target.classList.contains('favPlaylist') == true) {
+            this.queue.addToPlaylistQueue(e);
         }
     }
 

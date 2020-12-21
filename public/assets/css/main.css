@@ -629,7 +629,7 @@ a {
     list-style-type: none;
 }
 
-.favoriteActive .favQueue {
+.favoriteActive .favQueue, .playlistActive .playlistBtn {
     color: #dc2929;
 }
 
@@ -642,24 +642,26 @@ a {
     top: 0;
 }
 
-.favoriteWrap {
+.favoriteWrap, .playlistWrap, .playlistWrap .defaultView {
     left: 500px;
     top: 0px;
 }
 
 /* favoriteActive */
-.favoriteActive .defaultWrap {
-    left: -500px;
-}
-
-.favoriteActive .favoriteWrap {
-    left: 0px;
-}
-
-.favoriteWrap .defaultView {
+.favoriteWrap .defaultView, .playlistWrap .defaultView {
     text-align: center;
     margin-top: 16px;
     font-size: 20px;
     color: #6f6f6f;
     font-weight: 500;
 }
+
+.favoriteActive .favoriteWrap, .playlistActive .playlistWrap {
+    left: 0px;
+}
+
+.favoriteActive .defaultWrap, .playlistActive .defaultWrap {
+    left: -500px;
+}
+
+/* active playlist queue */
