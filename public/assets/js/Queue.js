@@ -66,95 +66,115 @@ class Queue {
     }
 
     queueValidation(config, anchor_ele) {
-        if ('tracklist' in anchor_ele.dataset) {
-            let isExist;
-            // already exeist in playlist then return false otherwise return node
-            if (config.queueType == 'default') {
-                isExist = this.default.includes(anchor_ele.dataset.tracklist);
-            } else if (config.queueType == 'favorite') {
-                isExist = this.favorite.includes(anchor_ele.dataset.tracklist)
-            }
-            if (isExist == false) {
+        // if ('tracklist' in anchor_ele.dataset) {
+        let isExist;
+        // already exeist in playlist then return false otherwise return node
+        if (config.queueType == 'default') {
+            isExist = this.default.includes(anchor_ele.dataset.tracklist);
+        } else if (config.queueType == 'favorite') {
+            isExist = this.favorite.includes(anchor_ele.dataset.tracklist)
+        } else if (config.queueType == 'playlist') {
+            isExist = this.playlist.includes(anchor_ele.dataset.img)
+        }
+        if (isExist == false) {
+            let musicNodes = [];
+            let trackPath;
+            let getIndex;
 
-                let isMusicNode = this.createQueueNodes(config, anchor_ele);
-                const trackPath = anchor_ele.dataset['tracklist'];
-                let getIndex;
+            if (config.queueType == 'playlist') {
+                let liAncher = this.createQueueNodes(config, anchor_ele, null, 'folderEl');
+                let ul = document.createElement('ul');
+                liAncher.classList.add('innerTracks');
+                liAncher.classList.add('deActive');
 
-                if (config.queueType == 'default') {
-                    this.el.defaultWrap.appendChild(isMusicNode);
-                    getIndex = this.default.push(trackPath);
-                } else if (config.queueType == 'favorite') {
-                    this.el.favoriteWrap.appendChild(isMusicNode);
-                    getIndex = this.favorite.push(trackPath);
+                for (const track of config.allTracks) {
+                    musicNodes.push(this.createQueueNodes(config, anchor_ele, track));
+                    trackPath = anchor_ele.dataset['img'];
+                    ul.append(...musicNodes);
+                    getIndex = this.playlist.push(trackPath);
                 }
+                liAncher.appendChild(ul)
+                this.el.playlistWrap.appendChild(liAncher);
 
-                // usefull for other queues/
-                if (config.isPlay == true) { // only play
-
-                    // remove playing class previes element and add current element
-                    if (config.queueType == 'default') {
-                        this.playInfo.currQueue = 'default';
-                    } else if (config.queueType == 'favorite') {
-                        this.playInfo.currQueue = 'favorite';
-                    }
-
-                    this.playInfo.currIndex = getIndex - 1;
-                } else {
-                    this.changeActiveState(config, anchor_ele, isMusicNode.firstChild);
-                    return; // nothing do any thing
-                }
-                this.changeActiveState(config, anchor_ele, isMusicNode.firstChild);
-                return 'chnageMusic';
             } else {
+                musicNodes.push(this.createQueueNodes(config, anchor_ele));
+                trackPath = anchor_ele.dataset['tracklist'];
+            }
+
+            if (config.queueType == 'default') {
+                this.el.defaultWrap.appendChild(musicNodes[0]);
+                getIndex = this.default.push(trackPath);
+            } else if (config.queueType == 'favorite') {
+                this.el.favoriteWrap.appendChild(musicNodes[0]);
+                getIndex = this.favorite.push(trackPath);
+            }
+
+            // usefull for other queues/
+            if (config.isPlay == true) { // only play
+
+                // remove playing class previes element and add current element
                 if (config.queueType == 'default') {
-                    if (anchor_ele.classList.contains('playing') == true) {
-                        return 'onlyPlayPause';
-                    } else {
-                        // change music on added queue
-                        if (config.isPlay == true) {
-                            let mainNode = (anchor_ele.classList.contains('listAnchor') == true) ?
-                                anchor_ele :
-                                this.musicApp.el.container.querySelector(`a[data-tracklist="${anchor_ele.dataset['tracklist']}"]`);
-
-                            // get playing node into queue
-                            let queueNode = (anchor_ele.classList.contains('queueItem') == true) ?
-                                anchor_ele :
-                                this.el.root.querySelector(`a[data-tracklist="${anchor_ele.dataset['tracklist']}"]`);
-
-                            // remove playing class previes element and add current element
-                            this.changeActiveState(config, mainNode, queueNode);
-                            return 'chnageMusic'; // change music
-                        }
-                        // alert("It's already added!")
-                    }
+                    this.playInfo.currQueue = 'default';
                 } else if (config.queueType == 'favorite') {
-                    const queueNode = anchor_ele;
-                    const mainNode = this.musicApp.el.container.querySelector(`a[data-tracklist="${anchor_ele.dataset.tracklist}"]`);
-                    if (
-                        anchor_ele.classList.contains('commDef') != true &&
-                        anchor_ele.classList.contains('playing') != true
-                    ) {
+                    this.playInfo.currQueue = 'favorite';
+                }
+
+                this.playInfo.currIndex = getIndex - 1;
+            } else {
+                this.changeActiveState(config, anchor_ele, musicNodes[0].firstChild);
+                return; // nothing do any thing
+            }
+            this.changeActiveState(config, anchor_ele, musicNodes[0].firstChild);
+            return 'chnageMusic';
+        } else {
+            if (config.queueType == 'default') {
+                if (anchor_ele.classList.contains('playing') == true) {
+                    return 'onlyPlayPause';
+                } else {
+                    // change music on added queue
+                    if (config.isPlay == true) {
+                        let mainNode = (anchor_ele.classList.contains('listAnchor') == true) ?
+                            anchor_ele :
+                            this.musicApp.el.container.querySelector(`a[data-tracklist="${anchor_ele.dataset['tracklist']}"]`);
+
+                        // get playing node into queue
+                        let queueNode = (anchor_ele.classList.contains('queueItem') == true) ?
+                            anchor_ele :
+                            this.el.root.querySelector(`a[data-tracklist="${anchor_ele.dataset['tracklist']}"]`);
+
+                        // remove playing class previes element and add current element
                         this.changeActiveState(config, mainNode, queueNode);
-                        return 'chnageMusic';
-                    } else if (anchor_ele.classList.contains('playing') == true) {
-                        return 'onlyPlayPause';
-                    } else {
-                        alert('Already Added');
-                        return false; // nothing do any thing
+                        return 'chnageMusic'; // change music
                     }
+                    // alert("It's already added!")
+                }
+            } else if (config.queueType == 'favorite') {
+                const queueNode = anchor_ele;
+                const mainNode = this.musicApp.el.container.querySelector(`a[data-tracklist="${anchor_ele.dataset.tracklist}"]`);
+                if (
+                    anchor_ele.classList.contains('commDef') != true &&
+                    anchor_ele.classList.contains('playing') != true
+                ) {
+                    this.changeActiveState(config, mainNode, queueNode);
+                    return 'chnageMusic';
+                } else if (anchor_ele.classList.contains('playing') == true) {
+                    return 'onlyPlayPause';
+                } else {
+                    alert('Already Added');
+                    return false; // nothing do any thing
                 }
             }
         }
-
-        return false;  // nothing do any thing
+        // }
+        // return false;  // nothing do any thing
     }
 
     // revove to queue
     removeToQueue(e) {
-        let wrapperMusicNode = this.musicApp.get_target_ancher(e.path, 'a');
+        let wrapperMusicNodes = this.musicApp.get_target_ancher(e.path, 'a');
 
         // remove on DOM
-        let rootMusicEl = wrapperMusicNode.parentElement;
+        let rootMusicEl = wrapperMusicNodes.parentElement;
         rootMusicEl.remove();
 
         let wrapElement = this.musicApp.get_target_ancher(e.path, '.queueList');
@@ -171,9 +191,7 @@ class Queue {
 
     // remove active playing class
     changeActiveState(config, mainNode, queueNode) {
-        // if (config.isPlay == true) {
         // remove playing class to all placeses
-        console.log(queueNode);
         if (this.el.playingElBody != null) {
             this.el.playingElBody.classList.remove('playing');
 
@@ -207,8 +225,21 @@ class Queue {
     }
 
     // Create Queue row Wrapper Element
-    createQueueNodes(config, anchor_ele) {
-        let musicPath = anchor_ele.dataset.tracklist;
+    createQueueNodes(config, anchor_ele, track = null, folderEl = null) {
+        let musicPath;
+        let heading;
+        let onlyDataset = false;
+        if (config.queueType == 'playlist' && track != null) {
+            musicPath = track;
+            heading = track.replace(/.mp3$/, '').replace(/-/g, ' ');
+        } else if (folderEl != null) {
+            musicPath = anchor_ele.dataset.img;
+            heading = anchor_ele.querySelector('.gridHead').textContent;
+            onlyDataset = true;
+        } else {
+            musicPath = anchor_ele.dataset.tracklist;
+            heading = anchor_ele.querySelector('.gridHead').textContent;
+        }
         // create elements
         const li = document.createElement('li');
         const a = document.createElement('a');
@@ -232,21 +263,39 @@ class Queue {
         removeBtn.className += 'removeBtn material-icons';
 
         img.className += 'blobImg';
+
         moreOpt.className += 'moreOpt material-icons';
         removeBtn.textContent = 'close';
         moreOpt.textContent = 'more_vert';
 
         // set dataset hasAttribute
-        a.dataset.tracklist = musicPath;
-        queueThumb.dataset.tracklist = musicPath;
-        img.dataset.tracklist = musicPath;
-        trackName.dataset.tracklist = musicPath;
+        if (onlyDataset == true) {
+            a.dataset.playlistGrp = musicPath;
+            queueThumb.dataset.playlistGrp = musicPath;
+            img.dataset.playlistGrp = musicPath;
+            trackName.dataset.playlistGrp = musicPath;
+        } else {
+            a.dataset.tracklist = musicPath;
+            queueThumb.dataset.tracklist = musicPath;
+            img.dataset.tracklist = musicPath;
+            trackName.dataset.tracklist = musicPath;
+        }
+
 
         img.src = anchor_ele.querySelector('.blobImg').src;
-        trackName.textContent = anchor_ele.querySelector('.gridHead').textContent;
+        trackName.textContent = heading;
 
         // append all Elements
         queueThumb.appendChild(img);
+
+        // backBtn for playlist 
+        if (folderEl != null) {
+            let backBtn = document.createElement('div');
+            backBtn.classList += 'backBtn material-icons';
+            backBtn.textContent = 'arrow_back';
+            queueThumb.appendChild(backBtn);
+        }
+
         a.append(queueThumb, trackName, removeBtn, moreOpt)
         li.appendChild(a);
         return li;
@@ -293,18 +342,21 @@ class Queue {
             event: e,
             isPlay: false,
             queueType: 'playlist'
+
         }
         // get info to anchor tag
 
         if (anchor_ele.dataset.img == undefined) {
             const track = anchor_ele.dataset.tracklist;
-            // this.addToQueue(config);
+            config.allTracks = track;
+            this.addToQueue(config);
         } else {
             const tracks = this.getMusicTracks(anchor_ele);
-            console.log(tracks);
+            config.allTracks = tracks;
+            this.addToQueue(config);
         }
-        
-        
+
+
     }
 
     getMusicTracks(anchor_ele) {
@@ -351,6 +403,20 @@ class Queue {
 
         let currDir = findDir(cloneData, testData);
         return tracks(JSON.parse(JSON.stringify(currDir)));
+    }
+
+    toggleInnerPlaylist(e) {
+        // add active class
+        let aTag = this.musicApp.get_target_ancher(e.path, 'a')
+        aTag.parentElement.classList.toggle('deActive');
+
+        // add back button 
+        let imgTag = aTag.querySelector('.queueThumb');
+        imgTag.removeAttribute('data-playlist-grp');
+        // imgTag.innerHTML = '';
+        imgTag.appendChild(backBtn);
+
+
     }
 }
 export default Queue;

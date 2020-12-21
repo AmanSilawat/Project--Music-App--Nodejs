@@ -133,6 +133,13 @@ class MusicApp {
         if (e.target.classList.contains('favPlaylist') == true) {
             this.queue.addToPlaylistQueue(e);
         }
+
+        // add to playlist queue
+        if (e.target.hasAttribute('data-playlist-grp') == true) {
+            this.queue.toggleInnerPlaylist(e);
+        }
+
+        console.log(e.target);
     }
 
     innerContent(e) {
@@ -208,6 +215,7 @@ class MusicApp {
                     this.audio.dataset.imgSrc = blobImg;
                     this.audio.title = musicName.match(/([\w-]+)\.mp3$/)[1].replace(/-/g, ' ');
                     this.audio.src = `./assets/data/${musicName}`;
+                    this.audio.muted = true;
 
                     anchorEle.classList.add('playing');
                     this.musicStateChange()

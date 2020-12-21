@@ -44,7 +44,7 @@ header {
     width: 350px;
     height: calc(100vh - 50px);
     background-color: #fff;
-    padding: 15px 8px 8px;
+    padding: 0px 8px 8px;
     box-shadow: 1px 0px 8px 1px rgba(0, 0, 0, 0.22);
     overflow-y: auto;
     overflow-x: hidden;
@@ -60,8 +60,11 @@ header {
 .queueHeader {
     display: flex;
     border-bottom: 1px solid #6e6e6e5b;
-    padding: 0px 0px 10px;
+    padding: 15px 0px 10px;
     margin-bottom: 10px;
+    position: relative;
+    z-index: 12;
+    background-color: #fff;
 }
 
 .queueHeader .queueTitle {
@@ -166,6 +169,7 @@ header {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-transform: capitalize;
 }
 
 footer {
@@ -621,6 +625,7 @@ a {
 .queueList .queueItem {
     display: flex;
     align-items: center;
+    background-color: #fff;
 }
 
 /* .queueHeader */
@@ -665,3 +670,90 @@ a {
 }
 
 /* active playlist queue */
+
+
+/* inner playlist queue styling */
+.innerTracks .queueItem{
+    position: relative;
+    z-index: 12;
+}
+
+.innerTracks .queueItem + ul {
+    transition: all .5s cubic-bezier(0.27, 0.85, 0.68, 1.26);
+    position: absolute;
+    top: 70px;
+    left: 0px;
+    width: 100%;
+    height: inherit;
+    z-index: 10;
+}
+
+.deActive > .queueItem + ul {
+    top: -251px;
+}
+
+.queueHeader::after {
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 40px;
+    left: 0;
+    top: 100%;
+    z-index: 11;
+    background-color: rgb(255 255 255);
+}
+
+.queueHeader::before {
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 1px;
+    left: 0;
+    top: 100%;
+    z-index: 13;
+    background-color: #6e6e6e5b;
+}
+
+.innerTracks .backBtn {
+    font-size: 26px;
+    border-radius: 50%;
+    padding: 3px;
+    color: #ababab;
+    cursor: pointer;
+    transition: all 0.3s .8s;
+    border: 1px solid #9f9f9f;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+}
+
+.deActive.innerTracks .backBtn {
+    left: -50%;
+}
+
+.innerTracks .queueThumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: unset;
+}
+
+.innerTracks > a{
+    border: unset;
+}
+
+.innerTracks > a img{
+    position: relative;
+    border: 1px solid #6d6d6d5b;
+    left: -80px;
+    transition: all .3s ease-in .7s;
+}
+
+.deActive.innerTracks > a img{
+    left: 0px;
+}
+
+.playlistWrap > li {
+    position: relative;
+}
