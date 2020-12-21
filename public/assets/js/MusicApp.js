@@ -103,7 +103,7 @@ class MusicApp {
         if (e.target.classList.contains('addToQueue') == true) {
             const config = {
                 event: e,
-                appendNPlay: false,
+                isPlay: false,
                 queueType: 'default'
             }
             this.queue.addToQueue(config);
@@ -183,7 +183,7 @@ class MusicApp {
         }
         const config = {
             event: e,
-            appendNPlay: true,
+            isPlay: true,
             queueType: queueType
         }
         let changeMusic = this.queue.addToQueue(config);

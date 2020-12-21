@@ -61,76 +61,91 @@ class Queue {
     // add to queue
     addToQueue(config) {
         const anchor_ele = this.musicApp.get_target_ancher(config.event.path, 'a');
-        const state = this.queueValidation(config, anchor_ele);
-        if (state == 'onlyPlayPause') {
-            // console.log('trueeeee');
-        }
-        return state;
+        return this.queueValidation(config, anchor_ele);
     }
 
     queueValidation(config, anchor_ele) {
         if ('tracklist' in anchor_ele.dataset) {
             let isExist;
-
             // already exeist in playlist then return false otherwise return node
             if (config.queueType == 'default') {
                 isExist = this.default.includes(anchor_ele.dataset.tracklist);
             } else if (config.queueType == 'favorite') {
                 isExist = this.favorite.includes(anchor_ele.dataset.tracklist)
             }
-            
-            if (isExist != true) {
+            if (isExist == false) {
 
                 let isMusicNode = this.createQueueNodes(config, anchor_ele);
                 const trackPath = anchor_ele.dataset['tracklist'];
                 let getIndex;
 
                 if (config.queueType == 'default') {
-                    this.el.defaultWrap.appendChild(isMusicNode); // diff
-                    getIndex = this.default.push(trackPath); // diff
+                    this.el.defaultWrap.appendChild(isMusicNode);
+                    getIndex = this.default.push(trackPath);
                 } else if (config.queueType == 'favorite') {
-                    this.el.favoriteWrap.appendChild(isMusicNode); // diff
-                    getIndex = this.favorite.push(trackPath); // diff
+                    this.el.favoriteWrap.appendChild(isMusicNode);
+                    getIndex = this.favorite.push(trackPath);
                 }
 
                 // usefull for other queues/
-                if (config.appendNPlay == true) {
-                    this.changeActiveState(config.queueType, anchor_ele, isMusicNode.firstChild);
+                if (config.isPlay == true) { // only play
 
                     // remove playing class previes element and add current element
                     if (config.queueType == 'default') {
-                        this.playInfo.currQueue = 'default'; // diff
+                        this.playInfo.currQueue = 'default';
                     } else if (config.queueType == 'favorite') {
-                        this.playInfo.currQueue = 'favorite'; // diff
+                        this.playInfo.currQueue = 'favorite';
                     }
-                    
-                    this.playInfo.currIndex = getIndex - 1;
-                }
 
+                    this.playInfo.currIndex = getIndex - 1;
+                } else {
+                    this.changeActiveState(config.queueType, anchor_ele, isMusicNode.firstChild);
+                    return; // nothing do any thing
+                }
+                this.changeActiveState(config.queueType, anchor_ele, isMusicNode.firstChild);
                 return 'chnageMusic';
             } else {
-                if (anchor_ele.classList.contains('playing') == true) {
-                    return 'onlyPlayPause';
+                if (config.queueType == 'default') {
+                    if (anchor_ele.classList.contains('playing') == true) {
+                        return 'onlyPlayPause';
+                    } else {
+                        // change music on added queue
+                        if (config.isPlay == true) {
+                            let mainNode = (anchor_ele.classList.contains('listAnchor') == true) ?
+                                anchor_ele :
+                                this.musicApp.el.container.querySelector(`a[data-tracklist="${anchor_ele.dataset['tracklist']}"]`);
+
+                            // get playing node into queue
+                            let queueNode = (anchor_ele.classList.contains('queueItem') == true) ?
+                                anchor_ele :
+                                this.el.root.querySelector(`a[data-tracklist="${anchor_ele.dataset['tracklist']}"]`);
+
+                            // remove playing class previes element and add current element
+                            this.changeActiveState(config.queueType, mainNode, queueNode);
+                            return 'chnageMusic'; // change music
+                        }
+                        // alert("It's already added!")
+                    }
+                } else if (config.queueType == 'favorite') {
+                    const queueNode = anchor_ele;
+                    const mainNode = this.musicApp.el.container.querySelector(`a[data-tracklist="${anchor_ele.dataset.tracklist}"]`);
+                    if (
+                        anchor_ele.classList.contains('commDef') != true &&
+                        anchor_ele.classList.contains('playing') != true
+                    ) {
+                        this.changeActiveState(config.queueType, mainNode, queueNode);
+                        return 'chnageMusic';
+                    } else if (anchor_ele.classList.contains('playing') == true) {
+                        return 'onlyPlayPause';
+                    } else {
+                        alert('Already Added');
+                        return false; // nothing do any thing
+                    }
                 }
             }
         }
 
-        if (config.appendNPlay != true) {
-            alert("It's already added!")
-        } else {
-            let mainNode = (anchor_ele.classList.contains('listAnchor') == true) ?
-                anchor_ele :
-                this.musicApp.el.container.querySelector(`a[data-tracklist="${anchor_ele.dataset['tracklist']}"]`);
-
-            // get playing node into queue
-            let queueNode = (anchor_ele.classList.contains('queueItem') == true) ?
-                anchor_ele :
-                this.el.root.querySelector(`a[data-tracklist="${anchor_ele.dataset['tracklist']}"]`);
-
-            // remove playing class previes element and add current element
-            this.changeActiveState(config.queueType, mainNode, queueNode);
-            return 'chnageMusic'; // change music
-        }
+        return false;  // nothing do any thing
     }
 
     // revove to queue
@@ -150,49 +165,40 @@ class Queue {
             let indexPos = this.favorite.indexOf(wrapperMusicNode.dataset.tracklist);
             this.favorite.splice(indexPos, 1);
         }
-        
+
     }
 
     // remove active playing class
     changeActiveState(queueType, mainNode, queueNode) {
-        // remove playing class all placeses
-        console.log(queueType);
+        // remove playing class to all placeses
         if (this.el.playingElBody != null) {
             this.el.playingElBody.classList.remove('playing');
 
-            // console.log(this.el.playingElDefaultQueue);
-            // console.log(this.el.playingElFavoriteQueue);
-            if (
-                this.el.playingElDefaultQueue != null &&
-                queueType == 'default'
-            ) {
-                console.log('if');
-                this.el.playingElDefaultQueue.classList.remove('playing');
-            } else if (
-                this.el.playingElFavoriteQueue != null &&
-                queueType == 'favorite'
-            ) {
-                console.log('else');
-                this.el.playingElFavoriteQueue.classList.remove('playing');
+            const defaultWrapEl = this.el.defaultWrap.querySelector('.playing');
+            const favoriteWrapEl = this.el.favoriteWrap.querySelector('.playing');
+
+            if (defaultWrapEl != null) {
+                defaultWrapEl.classList.remove('playing')
+            }
+            
+            if (favoriteWrapEl != null) {
+                favoriteWrapEl.classList.remove('playing')
             }
         }
-        // add playing Element in queue
+
+        // add playing class from all matched content
+        const defaultWrapEl = this.el.defaultWrap.querySelector(`a[data-tracklist="${queueNode.dataset.tracklist}"]`);
+        const favoriteWrapEl = this.el.favoriteWrap.querySelector(`a[data-tracklist="${queueNode.dataset.tracklist}"]`);
+
         this.el.playingElBody = mainNode;
         this.el.playingElBody.classList.add('playing');
 
-        // add playing class in active   queue
-        if (queueType == 'default') {
-            this.el.playingElDefaultQueue = queueNode;
-        } else if (queueType == 'favorite') {
-            this.el.playingElFavoriteQueue = queueNode;
+        if (defaultWrapEl != null) {
+            defaultWrapEl.classList.add('playing')
         }
-
-        if (this.default.includes(queueNode.dataset.tracklist)) {
-            this.el.playingElDefaultQueue.classList.add('playing');
-        }
-
-        if (this.favorite.includes(queueNode.dataset.tracklist)) {
-            this.el.playingElFavoriteQueue.classList.add('playing');
+        
+        if (favoriteWrapEl != null) {
+            favoriteWrapEl.classList.add('playing')
         }
     }
 
@@ -210,7 +216,12 @@ class Queue {
 
         // set info in elements
         li.className += 'rowTrack';
-        a.className += 'queueItem commDef';
+        a.classList.add('queueItem');
+
+        if (config.queueType == 'default') {
+            a.classList.add('commDef');
+        }
+
         a.href = 'javascript:void(0)';
         queueThumb.className += 'queueThumb material-icons';
         trackName.className += 'trackName gridHead';
@@ -249,7 +260,7 @@ class Queue {
         }
         const config = {
             event: e,
-            appendNPlay: false,
+            isPlay: false,
             queueType: 'favorite'
         }
         this.addToQueue(config);
