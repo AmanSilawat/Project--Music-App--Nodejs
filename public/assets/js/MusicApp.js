@@ -85,8 +85,7 @@ class MusicApp {
             let currGroup = e.target.parentElement;
             let prevGroup = e.target.parentElement.previousElementSibling;
             currGroup.remove();
-            prevGroup.classList.remove('hideGroup')
-            console.log(currGroup, prevGroup);
+            prevGroup.classList.remove('hideGroup');
         }
 
         // music grid click to show hide
@@ -101,8 +100,11 @@ class MusicApp {
 
         // add to queue
         if (e.target.classList.contains('addToQueue') == true) {
+            let mainEl = this.get_target_ancher(e.path, 'a');
+            const directory = ('img' in mainEl.dataset) ? mainEl.dataset.img : mainEl.dataset.tracklist;
             const config = {
-                event: e,
+                mainEle: mainEl,
+                directory: directory,
                 isPlay: false,
                 queueType: 'default'
             }
@@ -138,8 +140,6 @@ class MusicApp {
         if (e.target.hasAttribute('data-playlist-grp') == true) {
             this.queue.toggleInnerPlaylist(e);
         }
-
-        console.log(e.target);
     }
 
     innerContent(e) {
@@ -186,7 +186,7 @@ class MusicApp {
 
     getSong(e) {
         let anchorEle = this.get_target_ancher(e.path, 'a');
-        
+
         // same song play in multiple queue
         let uniqeKey = this.get_target_ancher(e.path, '.uniqeKey');
         let queueType;
@@ -194,12 +194,16 @@ class MusicApp {
         if (uniqeKey.classList.contains('listAnchor') == true) {
             queueType = 'default';
         } else if (uniqeKey.classList.contains('defaultWrap') == true) {
-                queueType = 'default';
+            queueType = 'default';
         } else if (uniqeKey.classList.contains('favoriteWrap') == true) {
             queueType = 'favorite';
         }
+
+        let mainEl = this.get_target_ancher(e.path, 'a');
+        const directory = ('img' in mainEl.dataset) ? mainEl.dataset.img : mainEl.dataset.tracklist;
         const config = {
-            event: e,
+            mainEle: mainEl,
+            directory: directory,
             isPlay: true,
             queueType: queueType
         }

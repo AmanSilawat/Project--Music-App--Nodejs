@@ -626,11 +626,11 @@ a {
     display: flex;
     align-items: center;
     background-color: #fff;
+    padding-bottom: 8px;
 }
 
 /* .queueHeader */
 .queueList li {
-    padding-bottom: 8px;
     list-style-type: none;
 }
 

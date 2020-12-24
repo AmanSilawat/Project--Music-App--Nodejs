@@ -15,12 +15,13 @@ const utils = {
             ''
         );
         const pathList = songListStr.split('\\n');
+        console.log(pathList);
         const pathListArr = pathList.map((path) => path.split('/'));
 
         const treeData = {};
         treeData['RootNode'] = new MusicNode('RootNode', 'RootNode');
 
-        function recursion(data, MusicNode, treeData, previousNode = 'RootNode') {
+        function recursion(data, data2, MusicNode, treeData, previousNode = 'RootNode') {
             if (data.length == 0) {
                 return treeData['RootNode'];
             }
@@ -44,19 +45,26 @@ const utils = {
             } else {
                 try {
                     treeData[previousNode].children[0].tracks.push(firstVal);
+                    let lastArr = data2.pop();
+                    treeData[previousNode].children[0].path = lastArr.splice(0, lastArr.length - 1).join('/');
                 } catch (error) {
                     treeData[firstVal] = new MusicNode(firstVal, 'track');
                     treeData[previousNode].children.push(treeData[firstVal]);
                     treeData[firstVal].tracks.push(firstVal);
+                    let lastArr = data2.pop();
+                    treeData[previousNode].children[0].path = lastArr.splice(0, lastArr.length - 1).join('/');
                 }
 
                 previousNode = 'RootNode';
             }
 
-            return recursion(data, MusicNode, treeData, previousNode);
+            return recursion(data, data2, MusicNode, treeData, previousNode);
         }
 
-        const ressult = recursion(pathListArr, MusicNode, treeData);
+        let data = JSON.parse(JSON.stringify(pathListArr));
+        let data2 = JSON.parse(JSON.stringify(pathListArr));
+        const ressult = recursion(data, data2, MusicNode, treeData);
+        console.log(ressult);
         return ressult;
     },
 

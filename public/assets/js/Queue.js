@@ -61,25 +61,25 @@ class Queue {
 
     // add to queue
     addToQueue(config) {
-        const anchor_ele = this.musicApp.get_target_ancher(config.event.path, 'a');
-        return this.queueValidation(config, anchor_ele);
+        this.queueValidation(config)
     }
 
-    queueValidation(config, anchor_ele) {
-        // if ('tracklist' in anchor_ele.dataset) {
-        let isExist;
-        // already exeist in playlist then return false otherwise return node
-        if (config.queueType == 'default') {
-            isExist = this.default.includes(anchor_ele.dataset.tracklist);
-        } else if (config.queueType == 'favorite') {
-            isExist = this.favorite.includes(anchor_ele.dataset.tracklist)
-        } else if (config.queueType == 'playlist') {
-            isExist = this.playlist.includes(anchor_ele.dataset.img)
+    queueValidation(config) {
+        const isExist = this.isExistInQueue(config);
+
+        if (isExist == true) {
+            // this.createMusicListEl(config);
+        } else {
+            this.exisitQueue(config);
         }
+    }
+
+    queueValidation001(config, anchor_ele) {
+        let isExist;
         if (isExist == false) {
             let musicNodes = [];
             let trackPath;
-            let getIndex;
+            let getIndex;  // doneeeeeeeee
 
             if (config.queueType == 'playlist') {
                 let liAncher = this.createQueueNodes(config, anchor_ele, null, 'folderEl');
@@ -169,6 +169,137 @@ class Queue {
         // return false;  // nothing do any thing
     }
 
+    // check track exist or not
+    isExistInQueue(config) {
+        switch (config.queueType) {
+            case 'default':
+                return this.default.includes(config.directory);
+
+            case 'favorite':
+                return this.favorite.includes(config.directory);
+
+            case 'playlist':
+                return this.playlist.includes(config.directory);
+
+            default:
+                return false;
+        }
+    }
+
+    // if is exist queue
+    exisitQueue(config) {
+        if (config.queueType == 'playlist') {
+            this.playlistHandler(config);
+        } else {
+            this.trackHandler(config);
+        }
+    }
+
+    // Handle playlist 
+    playlistHandler(config) {
+        const elTxt = config.mainEle.querySelector('.gridHead').textContent;
+        const imgSrc = config.mainEle.querySelector('.blobImg').src;
+        const dataset = {
+            dsType: 'playlistGrp',
+            dsValue: config.directory
+        }
+
+        // create elements
+        // ? All Properties of obj { el, cls, elTxt, src, href, dsType, dsValue }
+        const li = { el: 'li', cls: 'rowTrack' };
+        const a = { el: 'a', cls: 'queueItem', href: 'javascript:void(0)', ...dataset };
+        const queueThumb = { el: 'div', cls: 'queueThumb material-icons', ...dataset };
+        const img = { el: 'img', cls: 'blobImg', src: imgSrc, ...dataset };
+        const trackName = { el: 'div', cls: 'trackName gridHead', elTxt: elTxt, ...dataset };
+        const removeBtn = { el: 'div', cls: 'removeBtn material-icons', elTxt: 'close', ...dataset };
+        const moreOpt = { el: 'div', cls: 'moreOpt material-icons', elTxt: 'more_vert', ...dataset };
+        const backBtn = { el: 'div', cls: 'backBtn material-icons', elTxt: 'arrow_back', ...dataset };
+
+        // create Elements
+        const nodes = this.createQueueEl({ li, a, queueThumb, img, trackName, removeBtn, moreOpt, backBtn });
+        
+        // append elements
+        nodes.queueThumb.append(nodes.img, nodes.backBtn);
+        nodes.a.append(nodes.queueThumb, nodes.trackName, nodes.removeBtn, nodes.moreOpt);
+        nodes.li.appendChild(nodes.a);
+
+        console.log(config);
+    }
+
+    // Handle default and favorite queue
+    trackHandler(config) {
+        const elTxt = config.mainEle.querySelector('.gridHead').textContent;
+        const imgSrc = config.mainEle.querySelector('.blobImg').src;
+        const dataset = { dsType: 'tracklist', dsValue: config.directory }
+
+        // create elements Objects
+        // ? All Properties of obj { el, cls, elTxt, src, href, dsType, dsValue }
+        const li = { el: 'li', cls: 'rowTrack' };
+        const a = { el: 'a', cls: 'queueItem', href: 'javascript:void(0)', ...dataset };
+        const queueThumb = { el: 'div', cls: 'queueThumb material-icons', ...dataset };
+        const img = { el: 'img', cls: 'blobImg', src: imgSrc, ...dataset };
+        const trackName = { el: 'div', cls: 'trackName gridHead', elTxt: elTxt, ...dataset };
+        const removeBtn = { el: 'div', cls: 'removeBtn material-icons', elTxt: 'close', ...dataset };
+        const moreOpt = { el: 'div', cls: 'moreOpt material-icons', elTxt: 'more_vert', ...dataset };
+
+        // create Elements
+        const nodes = this.createQueueEl({ li, a, queueThumb, img, trackName, removeBtn, moreOpt });
+
+        // append elements
+        nodes.queueThumb.appendChild(nodes.img);
+        nodes.a.append(nodes.queueThumb, nodes.trackName, nodes.removeBtn, nodes.moreOpt);
+        nodes.li.appendChild(nodes.a);
+
+        console.log(config);
+    }
+
+    // Create main queue ancher nodes
+    createQueueEl(nodesObj) {
+        let nodes = {};
+        // create nodes
+        for (const nodeConfig in nodesObj) {
+            nodes[nodeConfig] = this.createNode(nodesObj[nodeConfig]);
+        }
+        return nodes;
+    }
+
+    // create element with specific configration
+    createNode({ el = null, cls = null, elTxt = null, src = null, href = null, dsType = null, dsValue = null }) {
+        const node = document.createElement(el)
+
+        // add class in node
+        if (cls != null) {
+            node.className += cls;
+        }
+
+        // add textContent in node
+        if (elTxt != null) {
+            node.textContent = elTxt;
+        }
+
+        // add source file in ancher node
+        if (src != null) {
+            node.src = src;
+        }
+
+        // add href file in ancher node
+        if (href != null) {
+            node.href = href;
+        }
+
+        // add dataSet and value in node
+        if (dsType != null && dsValue) {
+            node.dataset[dsType] = dsValue;
+        }
+
+        // add dataSet and value in node
+        if (dsType != null && dsValue) {
+            node.dataset[dsType] = dsValue;
+        }
+
+        return node;
+    }
+
     // revove to queue
     removeToQueue(e) {
         let wrapperMusicNodes = this.musicApp.get_target_ancher(e.path, 'a');
@@ -240,59 +371,18 @@ class Queue {
             musicPath = anchor_ele.dataset.tracklist;
             heading = anchor_ele.querySelector('.gridHead').textContent;
         }
-        // create elements
-        const li = document.createElement('li');
-        const a = document.createElement('a');
-        const queueThumb = document.createElement('div');
-        const img = document.createElement('img');
-        const trackName = document.createElement('div');
-        const removeBtn = document.createElement('div');
-        const moreOpt = document.createElement('div');
 
         // set info in elements
-        li.className += 'rowTrack';
-        a.classList.add('queueItem');
-
         if (config.queueType == 'default') {
             a.classList.add('commDef');
         }
 
-        a.href = 'javascript:void(0)';
-        queueThumb.className += 'queueThumb material-icons';
-        trackName.className += 'trackName gridHead';
-        removeBtn.className += 'removeBtn material-icons';
-
-        img.className += 'blobImg';
-
-        moreOpt.className += 'moreOpt material-icons';
-        removeBtn.textContent = 'close';
-        moreOpt.textContent = 'more_vert';
-
-        // set dataset hasAttribute
-        if (onlyDataset == true) {
-            a.dataset.playlistGrp = musicPath;
-            queueThumb.dataset.playlistGrp = musicPath;
-            img.dataset.playlistGrp = musicPath;
-            trackName.dataset.playlistGrp = musicPath;
-        } else {
-            a.dataset.tracklist = musicPath;
-            queueThumb.dataset.tracklist = musicPath;
-            img.dataset.tracklist = musicPath;
-            trackName.dataset.tracklist = musicPath;
-        }
-
-
-        img.src = anchor_ele.querySelector('.blobImg').src;
-        trackName.textContent = heading;
 
         // append all Elements
         queueThumb.appendChild(img);
 
         // backBtn for playlist 
         if (folderEl != null) {
-            let backBtn = document.createElement('div');
-            backBtn.classList += 'backBtn material-icons';
-            backBtn.textContent = 'arrow_back';
             queueThumb.appendChild(backBtn);
         }
 
@@ -324,8 +414,11 @@ class Queue {
         if (defaultViewNode != null) {
             defaultViewNode.remove();
         }
+        let mainEl = this.musicApp.get_target_ancher(e.path, 'a');
+        const directory = ('img' in mainEl.dataset) ? mainEl.dataset.img : mainEl.dataset.tracklist;
         const config = {
-            event: e,
+            mainEle: mainEl,
+            directory: directory,
             isPlay: false,
             queueType: 'favorite'
         }
@@ -338,8 +431,11 @@ class Queue {
         if (defaultViewNode != null) {
             defaultViewNode.remove();
         }
+        let mainEl = this.musicApp.get_target_ancher(e.path, 'a');
+        const directory = ('img' in mainEl.dataset) ? mainEl.dataset.img : mainEl.dataset.tracklist;
         const config = {
-            event: e,
+            mainEle: mainEl,
+            directory: directory,
             isPlay: false,
             queueType: 'playlist'
 
@@ -347,16 +443,12 @@ class Queue {
         // get info to anchor tag
 
         if (anchor_ele.dataset.img == undefined) {
-            const track = anchor_ele.dataset.tracklist;
-            config.allTracks = track;
-            this.addToQueue(config);
+            config.allTracks = null;
         } else {
             const tracks = this.getMusicTracks(anchor_ele);
             config.allTracks = tracks;
-            this.addToQueue(config);
         }
-
-
+        this.addToQueue(config);
     }
 
     getMusicTracks(anchor_ele) {
@@ -382,27 +474,30 @@ class Queue {
         }
 
         // get all tracks
-        function tracks(currDir, arr = []) {
-            if (currDir.length == 0) {
-                return arr;
+        function tracks(data, result = []) {
+            if (data.length == 0) {
+                return result;
             }
-            let firstEle = currDir.shift();
+            const lastVal = data.pop();
 
-            if (firstEle.type == 'folder') {
-                currDir.push(firstEle.children)
-                return tracks(currDir, arr);
-            } else {
-                try {
-                    arr.push(...firstEle[0].tracks);
-                } catch (error) {
-                    arr.push(...firstEle.tracks);
-                }
+            if (lastVal.type == 'folder') {
+                data.push(...lastVal.children);
             }
-            return tracks(currDir, arr);
+
+            if (lastVal.type == 'track') {
+                let obj = {
+                    directory: lastVal.path,
+                    track: [...lastVal.tracks]
+                };
+                result.push(obj);
+            }
+
+            return tracks(data, result);
         }
 
         let currDir = findDir(cloneData, testData);
-        return tracks(JSON.parse(JSON.stringify(currDir)));
+        let res = tracks(JSON.parse(JSON.stringify(currDir)));
+        return res
     }
 
     toggleInnerPlaylist(e) {
