@@ -60,7 +60,7 @@ class Queue {
     }
 
     // add to queue
-    addToQueue(config) {
+    queueHandler(config) {
         this.queueValidation(config)
     }
 
@@ -70,7 +70,7 @@ class Queue {
         if (isExist == true) {
             // this.createMusicListEl(config);
         } else {
-            this.exisitQueue(config);
+            this.addInQueue(config);
         }
     }
 
@@ -187,25 +187,45 @@ class Queue {
     }
 
     // if is exist queue
-    exisitQueue(config) {
-        if (config.queueType == 'playlist') {
-            this.playlistHandler(config);
-        } else {
-            this.trackHandler(config);
+    addInQueue(config) {
+        switch (config.queueType) {
+            case 'playlist':
+                this.playlistHandler(config);
+                break;
+            
+            case 'favorite':
+                this.playlistHandler(config);
+                break;
+            
+            case 'default':
+                const nodesConfig = {
+                    textContent: config.mainEle.querySelector('.gridHead').textContent,
+                    imgSrc: config.mainEle.querySelector('.blobImg').src,
+                    dataset: {
+                        datasetType: 'tracklist',
+                        datasetValue: config.directory + config.singleTrack
+                    }
+                }
+                this.trackHandler(nodesConfig);
+                break;
+        
+            default:
+                break;
         }
     }
 
     // Handle playlist 
     playlistHandler(config) {
+        console.log(config.queueType);
         const elTxt = config.mainEle.querySelector('.gridHead').textContent;
         const imgSrc = config.mainEle.querySelector('.blobImg').src;
         const dataset = {
-            dsType: 'playlistGrp',
-            dsValue: config.directory
+            datasetType: 'playlistGrp',
+            datasetValue: config.directory
         }
 
         // create elements
-        // ? All Properties of obj { el, cls, elTxt, src, href, dsType, dsValue }
+        // ? All Properties of obj { el, cls, elTxt, src, href, datasetType, datasetValue }
         const li = { el: 'li', cls: 'rowTrack' };
         const a = { el: 'a', cls: 'queueItem', href: 'javascript:void(0)', ...dataset };
         const queueThumb = { el: 'div', cls: 'queueThumb material-icons', ...dataset };
@@ -223,24 +243,36 @@ class Queue {
         nodes.a.append(nodes.queueThumb, nodes.trackName, nodes.removeBtn, nodes.moreOpt);
         nodes.li.appendChild(nodes.a);
 
-        console.log(config);
+        // console.log(config);
+        // console.log(nodes.li);
+
+        for (const folderCollection of config.tracks) {
+            for (const track of folderCollection.tracks) {
+                const nodesConfig = {
+                    textContent: track.replace(/[-]|\.mp3/g, ' ').trimEnd(),
+                    imgSrc: 'not-available',
+                    dataset: {
+                        datasetType: 'tracklist',
+                        datasetValue: `${folderCollection.directory}/${track}`
+                    }
+                }
+                let node = this.trackHandler(nodesConfig);
+                console.log(node);
+            }
+        }
     }
 
     // Handle default and favorite queue
-    trackHandler(config) {
-        const elTxt = config.mainEle.querySelector('.gridHead').textContent;
-        const imgSrc = config.mainEle.querySelector('.blobImg').src;
-        const dataset = { dsType: 'tracklist', dsValue: config.directory }
-
+    trackHandler(nodesConfig) {
         // create elements Objects
-        // ? All Properties of obj { el, cls, elTxt, src, href, dsType, dsValue }
+        // ? All Properties of obj { el, cls, elTxt, src, href, datasetType, datasetValue }
         const li = { el: 'li', cls: 'rowTrack' };
-        const a = { el: 'a', cls: 'queueItem', href: 'javascript:void(0)', ...dataset };
-        const queueThumb = { el: 'div', cls: 'queueThumb material-icons', ...dataset };
-        const img = { el: 'img', cls: 'blobImg', src: imgSrc, ...dataset };
-        const trackName = { el: 'div', cls: 'trackName gridHead', elTxt: elTxt, ...dataset };
-        const removeBtn = { el: 'div', cls: 'removeBtn material-icons', elTxt: 'close', ...dataset };
-        const moreOpt = { el: 'div', cls: 'moreOpt material-icons', elTxt: 'more_vert', ...dataset };
+        const a = { el: 'a', cls: 'queueItem', href: 'javascript:void(0)', ...nodesConfig.dataset };
+        const queueThumb = { el: 'div', cls: 'queueThumb material-icons', ...nodesConfig.dataset };
+        const img = { el: 'img', cls: 'blobImg', src: nodesConfig.imgSrc, ...nodesConfig.dataset };
+        const trackName = { el: 'div', cls: 'trackName gridHead', elTxt: nodesConfig.textContent, ...nodesConfig.dataset };
+        const removeBtn = { el: 'div', cls: 'removeBtn material-icons', elTxt: 'close', ...nodesConfig.dataset };
+        const moreOpt = { el: 'div', cls: 'moreOpt material-icons', elTxt: 'more_vert', ...nodesConfig.dataset };
 
         // create Elements
         const nodes = this.createQueueEl({ li, a, queueThumb, img, trackName, removeBtn, moreOpt });
@@ -250,7 +282,7 @@ class Queue {
         nodes.a.append(nodes.queueThumb, nodes.trackName, nodes.removeBtn, nodes.moreOpt);
         nodes.li.appendChild(nodes.a);
 
-        console.log(config);
+        return nodes.li
     }
 
     // Create main queue ancher nodes
@@ -264,7 +296,7 @@ class Queue {
     }
 
     // create element with specific configration
-    createNode({ el = null, cls = null, elTxt = null, src = null, href = null, dsType = null, dsValue = null }) {
+    createNode({ el = null, cls = null, elTxt = null, src = null, href = null, datasetType = null, datasetValue = null }) {
         const node = document.createElement(el)
 
         // add class in node
@@ -288,13 +320,13 @@ class Queue {
         }
 
         // add dataSet and value in node
-        if (dsType != null && dsValue) {
-            node.dataset[dsType] = dsValue;
+        if (datasetType != null && datasetValue) {
+            node.dataset[datasetType] = datasetValue;
         }
 
         // add dataSet and value in node
-        if (dsType != null && dsValue) {
-            node.dataset[dsType] = dsValue;
+        if (datasetType != null && datasetValue) {
+            node.dataset[datasetType] = datasetValue;
         }
 
         return node;
@@ -425,30 +457,28 @@ class Queue {
         this.addToQueue(config);
     }
 
-    addToPlaylistQueue(e) {
-        let defaultViewNode = this.el.playlistWrap.querySelector('.defaultView');
-        const anchor_ele = this.musicApp.get_target_ancher(e.path, 'a');
-        if (defaultViewNode != null) {
-            defaultViewNode.remove();
-        }
+    setConfigQueue(e, config) {
         let mainEl = this.musicApp.get_target_ancher(e.path, 'a');
-        const directory = ('img' in mainEl.dataset) ? mainEl.dataset.img : mainEl.dataset.tracklist;
-        const config = {
-            mainEle: mainEl,
-            directory: directory,
-            isPlay: false,
-            queueType: 'playlist'
+        const isFolder = mainEl.dataset.img == undefined ? false : true;
+        
+        // Add or modify configration setting
+        config.mainEle = mainEl;
+        config.isPlay = config.isPlay || false;
+        config.isFolder = isFolder;
 
-        }
-        // get info to anchor tag
-
-        if (anchor_ele.dataset.img == undefined) {
-            config.allTracks = null;
+        // check folder or not
+        if (isFolder == false) {
+            let regex = mainEl.dataset.tracklist.match(/(.*\/)(\b[-\w]+.mp3)$/);
+            config.directory = regex[1]
+            config.singleTrack = regex[2];
         } else {
-            const tracks = this.getMusicTracks(anchor_ele);
-            config.allTracks = tracks;
+            const tracks = this.getMusicTracks(mainEl);
+            config.tracks = tracks;
+            config.directory = ('img' in mainEl.dataset) ? mainEl.dataset.img : mainEl.dataset.tracklist;
         }
-        this.addToQueue(config);
+
+        // add to queue
+        this.queueHandler(config);
     }
 
     getMusicTracks(anchor_ele) {
@@ -487,7 +517,7 @@ class Queue {
             if (lastVal.type == 'track') {
                 let obj = {
                     directory: lastVal.path,
-                    track: [...lastVal.tracks]
+                    tracks: [...lastVal.tracks]
                 };
                 result.push(obj);
             }

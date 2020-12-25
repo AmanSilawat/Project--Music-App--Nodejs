@@ -100,15 +100,8 @@ class MusicApp {
 
         // add to queue
         if (e.target.classList.contains('addToQueue') == true) {
-            let mainEl = this.get_target_ancher(e.path, 'a');
-            const directory = ('img' in mainEl.dataset) ? mainEl.dataset.img : mainEl.dataset.tracklist;
-            const config = {
-                mainEle: mainEl,
-                directory: directory,
-                isPlay: false,
-                queueType: 'default'
-            }
-            this.queue.addToQueue(config);
+            const config = { queueType: "favorite" }
+            this.queue.setConfigQueue(e, config);
         }
 
         // remove to queue
@@ -128,12 +121,14 @@ class MusicApp {
 
         // add to favorite queue
         if (e.target.classList.contains('myFav') == true) {
-            this.queue.addToFavQueue(e);
+            const config = { queueType: "favorite" }
+            this.queue.setConfigQueue(e, config);
         }
 
         // add to playlist queue
         if (e.target.classList.contains('favPlaylist') == true) {
-            this.queue.addToPlaylistQueue(e);
+            const config = { queueType: "playlist" }
+            this.queue.setConfigQueue(e, config);
         }
 
         // add to playlist queue
@@ -199,15 +194,13 @@ class MusicApp {
             queueType = 'favorite';
         }
 
-        let mainEl = this.get_target_ancher(e.path, 'a');
-        const directory = ('img' in mainEl.dataset) ? mainEl.dataset.img : mainEl.dataset.tracklist;
+        // define config for queue handler
         const config = {
-            mainEle: mainEl,
-            directory: directory,
-            isPlay: true,
-            queueType: queueType
+            queueType: "default",
+            isPlay: true
         }
-        let changeMusic = this.queue.addToQueue(config);
+        this.queue.setConfigQueue(e, config);
+
         switch (changeMusic) {
             case 'chnageMusic':
                 let musicName = e.target.dataset.tracklist;
