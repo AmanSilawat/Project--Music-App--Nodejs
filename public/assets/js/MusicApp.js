@@ -199,7 +199,7 @@ class MusicApp {
             queueType: "default",
             isPlay: true
         }
-        this.queue.setConfigQueue(e, config);
+        const changeMusic = this.queue.setConfigQueue(e, config);
 
         switch (changeMusic) {
             case 'chnageMusic':

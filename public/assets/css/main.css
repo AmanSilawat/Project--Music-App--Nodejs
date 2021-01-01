@@ -692,7 +692,7 @@ a {
     top: -251px;
 }
 
-.queueHeader::after {
+/* .queueHeader::after {
     position: absolute;
     content: '';
     width: 100%;
@@ -712,7 +712,7 @@ a {
     top: 100%;
     z-index: 13;
     background-color: #6e6e6e5b;
-}
+} */
 
 .innerTracks .backBtn {
     font-size: 26px;
@@ -755,5 +755,55 @@ a {
 }
 
 .playlistWrap > li {
+    position: relative;
+}
+
+/* popup */
+.popup {
+    position: fixed;
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #00000042;
+    width: 100%;
+    height: 100%;
+}
+
+.popup .innerPopup {
+    width: 300px;
+    background-color: #fff;
+    height: fit-content;
+    border-radius: 5px;
+    padding: 15px 0px;
+}
+
+.popup .popupHeader{
+    display: flex;
+    padding: 0px 15px 15px;
+    border-bottom: 1px solid #6e6e6e5b;
+    align-items: center;
+}
+
+.popup .popupHeader .heading{
+    font-weight: 500;
+    font-size: 20px;
+    flex: 1;
+}
+
+.popup .closePopup{
+    font-size: 10px;
+    color: #2e2e2e;
+    font-size: 25px;
+    cursor: pointer;
+    transition: all .3s;
+}
+
+.popup .closePopup:hover{
+    color: #ff0000;
+}
+
+.popup .newPlaylist {
+    padding: 0 15px;
     position: relative;
 }

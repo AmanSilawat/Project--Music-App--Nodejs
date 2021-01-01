@@ -17,6 +17,38 @@
 
     </header>
     <section class="constainer">
+        <!-- Add to playlist popup -->
+        <div class="popup">
+            <div class="innerPopup">
+                <div class="popupHeader">
+                    <div class="heading">Add to palylist</div>
+                    <div class="closePopup  material-icons">highlight_off</div>
+                </div>
+                <div class="popupBody">
+                    <div class="newPlaylist">
+                        <div class="inputField">
+                            <input type="text" placeholder="Create new playlist" />
+                            <button class="createNew material-icons">add_circle</button>
+                        </div>
+                    </div>
+                    <ul class="defaultList">
+                        <li data-list-name="abc">
+                            <span class="material-icons" data-list-name="abc">album</span>
+                            <span class="albumName" data-list-name="abc">Folder name</span>
+                        </li>
+                        <li data-list-name="abc">
+                            <span class="material-icons" data-list-name="abc">album</span>
+                            <span class="albumName" data-list-name="abc">Folder name</span>
+                        </li>
+                        <li data-list-name="abc">
+                            <span class="material-icons" data-list-name="abc">album</span>
+                            <span class="albumName" data-list-name="abc">Folder name</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         <!-- click on queue track -->
         <div class="queueMore popupStyle hide">
             <a href="javascript:void(0)">Add to Favorite</a>
@@ -36,7 +68,7 @@
         </div>
 
         <!-- favoriteActive -->
-        <div class="queuePanel shortView playlistActive">
+        <div class="queuePanel shortView">
             <div class="queueHeader">
                 <div class="queueTitle">Queue</div>
                 <div class="loopQueue material-icons" title="loop">loop</div>

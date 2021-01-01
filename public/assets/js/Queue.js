@@ -16,9 +16,11 @@ class Queue {
             currQueue: null,
             currIndex: null
         };
-        this.default = [];
-        this.favorite = [];
-        this.playlist = [];
+        this.list = {
+            default: [],
+            favorite: [],
+            playlist: []
+        }
 
         // initialization
         this.init();
@@ -61,7 +63,7 @@ class Queue {
 
     // add to queue
     queueHandler(config) {
-        this.queueValidation(config)
+        return this.queueValidation(config)
     }
 
     queueValidation(config) {
@@ -69,8 +71,13 @@ class Queue {
 
         if (isExist == true) {
             // this.createMusicListEl(config);
+            if (config.queueType == 'default') {
+                return 'onlyPlayPause';
+            } else {
+                return;
+            }
         } else {
-            this.addInQueue(config);
+            return this.addInQueue(config);
         }
     }
 
@@ -171,15 +178,16 @@ class Queue {
 
     // check track exist or not
     isExistInQueue(config) {
+        console.log(this.list)
         switch (config.queueType) {
             case 'default':
-                return this.default.includes(config.directory);
+                return this.list.default.includes(config.directory + config.singleTrack);
 
             case 'favorite':
-                return this.favorite.includes(config.directory);
+                return this.list.favorite.includes(config.directory + config.singleTrack);
 
             case 'playlist':
-                return this.playlist.includes(config.directory);
+                return this.list.playlist.includes(config.directory + config.singleTrack);
 
             default:
                 return false;
@@ -188,35 +196,46 @@ class Queue {
 
     // if is exist queue
     addInQueue(config) {
-        switch (config.queueType) {
-            case 'playlist':
-                this.playlistHandler(config);
-                break;
-            
-            case 'favorite':
-                this.playlistHandler(config);
-                break;
-            
-            case 'default':
-                const nodesConfig = {
-                    textContent: config.mainEle.querySelector('.gridHead').textContent,
-                    imgSrc: config.mainEle.querySelector('.blobImg').src,
-                    dataset: {
-                        datasetType: 'tracklist',
-                        datasetValue: config.directory + config.singleTrack
-                    }
+        // handle folders otherwise tracks
+        if (config.isFolder == true) {
+            this.folderHandler(config);
+        } else {
+            // create node config
+            const nodesConfig = {
+                textContent: config.mainEle.querySelector('.gridHead').textContent,
+                imgSrc: config.mainEle.querySelector('.blobImg').src,
+                dataset: {
+                    datasetType: 'tracklist',
+                    datasetValue: config.directory + config.singleTrack
                 }
-                this.trackHandler(nodesConfig);
-                break;
-        
-            default:
-                break;
+            }
+            // get track node and append
+            let liAncher = this.trackHandler(nodesConfig);
+
+            // handle type
+            switch (config.queueType) {
+                case 'default':
+                    this.el.defaultWrap.appendChild(liAncher);
+                    this.list.default.push(config.directory + config.singleTrack);
+                    return 'chnageMusic';
+
+                case 'favorite':
+                    if (this.el.favoriteWrap.children('defaultView')) {
+                        
+                    }
+                    this.el.defaultWrap.appendChild(liAncher);
+                    this.list.favorite.push(config.directory + config.singleTrack);
+                    return 'onlyPlayPause';
+                
+                default:
+                    return;
+            }
+            
         }
     }
 
     // Handle playlist 
-    playlistHandler(config) {
-        console.log(config.queueType);
+    folderHandler(config) {
         const elTxt = config.mainEle.querySelector('.gridHead').textContent;
         const imgSrc = config.mainEle.querySelector('.blobImg').src;
         const dataset = {
@@ -237,7 +256,7 @@ class Queue {
 
         // create Elements
         const nodes = this.createQueueEl({ li, a, queueThumb, img, trackName, removeBtn, moreOpt, backBtn });
-        
+
         // append elements
         nodes.queueThumb.append(nodes.img, nodes.backBtn);
         nodes.a.append(nodes.queueThumb, nodes.trackName, nodes.removeBtn, nodes.moreOpt);
@@ -460,7 +479,7 @@ class Queue {
     setConfigQueue(e, config) {
         let mainEl = this.musicApp.get_target_ancher(e.path, 'a');
         const isFolder = mainEl.dataset.img == undefined ? false : true;
-        
+
         // Add or modify configration setting
         config.mainEle = mainEl;
         config.isPlay = config.isPlay || false;
@@ -478,7 +497,7 @@ class Queue {
         }
 
         // add to queue
-        this.queueHandler(config);
+        return this.queueHandler(config);
     }
 
     getMusicTracks(anchor_ele) {
