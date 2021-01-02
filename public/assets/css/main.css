@@ -768,6 +768,8 @@ a {
     background-color: #00000042;
     width: 100%;
     height: 100%;
+    overflow-y: auto;
+    max-height: 100vh;
 }
 
 .popup .innerPopup {
@@ -804,6 +806,72 @@ a {
 }
 
 .popup .newPlaylist {
-    padding: 0 15px;
+    padding: 10px 15px;
     position: relative;
+}
+
+.popupBody .inputField {
+    position: relative;
+}
+
+.popupBody .inputField input {
+    width: 100%;
+    font-size: 17px;
+    padding: 5px 30px 5px 10px;
+    letter-spacing: 1px;
+    color: #2e2e2e;
+    border: 1px solid #ababab;
+    outline: none;
+    border-radius: 3px;
+}
+
+.popupBody .createNew {
+    color: #f66470;
+    position: absolute;
+    right: 5px;
+    top: 49%;
+    font-size: 25px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    transition: all .3s;
+}
+
+.popupBody .createNew:hover {
+    color: #ff0000;
+
+}
+
+.popupBody .defaultList {
+    list-style-type: none;
+}
+
+.defaultList li {
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all .2s;
+}
+
+.defaultList li:hover {
+    background-color: #e5e5e5;
+}
+
+.defaultList .albumName {
+    padding-left: 5px;
+}
+
+.defaultList .musicIcon{
+    transition: all .2s;
+    color: #9b9b9b;
+}
+
+.defaultList li:hover .musicIcon{color: #f66470;}
+
+.activePopup {
+    overflow-y: hidden;
+}
+
+.opened {
+    visibility: visible;
 }

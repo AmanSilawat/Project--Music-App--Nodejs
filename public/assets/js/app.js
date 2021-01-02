@@ -1,6 +1,7 @@
 import Utils from '../services/utils.js';
 import MusicApp from './MusicApp.js';
 import MusicAppView from './MusicAppView.js';
+import PopupJs from './PopupJs.js';
 import Base64Binary from './Base64Binary.js';
 
 let mainEle = document.getElementById('container');
@@ -256,3 +257,35 @@ document.addEventListener('DOMContentLoaded', async function musicDirData(params
 //     startTime += buffer.duration;
 //     console.log(startTime);
 // }
+
+let popupBody = `
+<div class="popupBody">
+    <div class="newPlaylist">
+        <div class="inputField">
+            <input type="text" placeholder="Create new playlist" />
+            <div class="createNew material-icons">create_new_folder</div>
+        </div>
+    </div>
+    <ul class="defaultList">
+        <li data-list-name="abc">
+            <span class="musicIcon material-icons" data-list-name="abc">queue_music</span>
+            <span class="albumName" data-list-name="abc">Folder name</span>
+        </li>
+        <li data-list-name="abc">
+            <span class="musicIcon material-icons" data-list-name="abc">queue_music</span>
+            <span class="albumName" data-list-name="abc">Folder name</span>
+        </li>
+        <li data-list-name="abc">
+            <span class="musicIcon material-icons" data-list-name="abc">queue_music</span>
+            <span class="albumName" data-list-name="abc">Folder name</span>
+        </li>
+    </ul>
+</div>`;
+
+let x = new PopupJs({
+    id: 'createPlaylistPopup',
+    headingTxt: 'Add to palylist',
+    body: popupBody,
+});
+
+console.log(x);
