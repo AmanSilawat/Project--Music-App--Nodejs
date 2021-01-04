@@ -1,35 +1,59 @@
 class PopupJs {
-    constructor({ id = null, headingTxt = null, body = null, footer = null }) {
+    constructor({ id = null, headingTxt = null, body = null, footer = null } = {}) {
+        this.id = id;
+        this.headingTxt = headingTxt;
+        this.body = body;
+        this.footer = footer;
         this.popupEl = null;
-        this.init(id, headingTxt, body, footer);
+        this.pop();
     }
 
-    init(id, headingTxt, body, footer) {
-        let popupNodes = this.getPopup(id, headingTxt, body, footer);
+    pop() {
+        let popupNodes = this.getPopup(this.id, this.headingTxt, this.body, this.footer);
         
         // event Listener
-        this.eventListener(popupNodes);
+        this.eventListener(popupNodes, this.id);
 
         // append in body
         document.body.prepend(popupNodes.popup);
         this.popupEl = popupNodes.popup;
     }
 
-    eventListener(popupNodes) {
-        console.log(popupNodes.closePopup);
-        popupNodes.closePopup.addEventListener('click', (event) => this.closePopup(event))
+    // Add Event listener
+    eventListener() {
+        document.body.addEventListener('click', (event) => this.eventHandler(event), true)
+    }
+
+    // handle Event listener
+    eventHandler(e) {
+
+        // close popup on blank area and close button
+        if (e.target.classList.contains('popup') == true || e.target.classList.contains('closePopup') == true) {
+            console.log(true);
+            this.closePopup();
+        }
+
+        // open popup
+        if (e.target.dataset.popup == this.popupEl.id) {
+            this.opened();
+        }
+    }
+
+    opened(e) {
+        this.popupEl.classList.remove('closed')
+        document.body.classList.add('activePopup');
     }
 
     closePopup() {
+        this.popupEl.classList.add('closed');
         document.body.classList.remove('activePopup');
-        this.popupEl.classList.remove('opened');
-        console.log('clickkkkkk');
     }
 
-    getPopup(id, headingTxt, body, footer) {
+    getPopup() {
         // default nodes
         let ndConfig = {};
-        ndConfig.popup = { el: 'div', cls: 'popup' };
+        ndConfig.popup = { el: 'div', cls: 'popup closed' };
+        ndConfig.popupLayer = { el: 'div', cls: 'popupLayer' };
         ndConfig.innerPopup = { el: 'div', cls: 'innerPopup' };
         ndConfig.popupHeader = { el: 'div', cls: 'popupHeader' };
         ndConfig.heading = { el: 'div', cls: 'heading', elTxt: "Heading" };
@@ -37,21 +61,21 @@ class PopupJs {
         ndConfig.popupBody = { el: 'div', cls: 'popupBody' };
 
         // user defines node
-        if (id != null) {
-            ndConfig.popup.id = id;
+        if (this.id != null) {
+            ndConfig.popup.id = this.id;
         }
 
-        if (headingTxt != null) {
-            ndConfig.heading.elTxt = headingTxt;
+        if (this.headingTxt != null) {
+            ndConfig.heading.elTxt = this.headingTxt;
         }
 
-        if (body != null) {
-            ndConfig.popupBody.innerHtml = body;
+        if (this.body != null) {
+            ndConfig.popupBody.innerHtml = this.body;
         }
 
-        if (footer != null) {
+        if (this.footer != null) {
             ndConfig.footer = { el: 'div', cls: 'popupFooter' };
-            ndConfig.footer.innerHtml = footer;
+            ndConfig.footer.innerHtml = this.footer;
         }
 
 
@@ -59,7 +83,8 @@ class PopupJs {
 
         nodes.popupHeader.append(nodes.heading, nodes.closePopup);
         nodes.innerPopup.append(nodes.popupHeader, nodes.popupBody);
-        nodes.popup.appendChild(nodes.innerPopup);
+        nodes.popupLayer.appendChild(nodes.innerPopup);
+        nodes.popup.appendChild(nodes.popupLayer);
         return nodes;
     }
 

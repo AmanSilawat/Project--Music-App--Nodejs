@@ -758,63 +758,12 @@ a {
     position: relative;
 }
 
-/* popup */
-.popup {
-    position: fixed;
-    z-index: 20;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #00000042;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    max-height: 100vh;
-}
-
-.popup .innerPopup {
-    width: 300px;
-    background-color: #fff;
-    height: fit-content;
-    border-radius: 5px;
-    padding: 15px 0px;
-}
-
-.popup .popupHeader{
-    display: flex;
-    padding: 0px 15px 15px;
-    border-bottom: 1px solid #6e6e6e5b;
-    align-items: center;
-}
-
-.popup .popupHeader .heading{
-    font-weight: 500;
-    font-size: 20px;
-    flex: 1;
-}
-
-.popup .closePopup{
-    font-size: 10px;
-    color: #2e2e2e;
-    font-size: 25px;
-    cursor: pointer;
-    transition: all .3s;
-}
-
-.popup .closePopup:hover{
-    color: #ff0000;
-}
-
-.popup .newPlaylist {
-    padding: 10px 15px;
+/* popup  */
+#playlistPopup .inputField {
     position: relative;
 }
 
-.popupBody .inputField {
-    position: relative;
-}
-
-.popupBody .inputField input {
+#playlistPopup .inputField input {
     width: 100%;
     font-size: 17px;
     padding: 5px 30px 5px 10px;
@@ -825,7 +774,7 @@ a {
     border-radius: 3px;
 }
 
-.popupBody .createNew {
+#playlistPopup .createNew {
     color: #f66470;
     position: absolute;
     right: 5px;
@@ -836,16 +785,16 @@ a {
     transition: all .3s;
 }
 
-.popupBody .createNew:hover {
+#playlistPopup .createNew:hover {
     color: #ff0000;
 
 }
 
-.popupBody .defaultList {
+#playlistPopup .defaultList {
     list-style-type: none;
 }
 
-.defaultList li {
+#playlistPopup .defaultList li {
     padding: 10px 15px;
     display: flex;
     align-items: center;
@@ -853,25 +802,17 @@ a {
     transition: all .2s;
 }
 
-.defaultList li:hover {
+#playlistPopup .defaultList li:hover {
     background-color: #e5e5e5;
 }
 
-.defaultList .albumName {
+#playlistPopup .defaultList .albumName {
     padding-left: 5px;
 }
 
-.defaultList .musicIcon{
+#playlistPopup .defaultList .musicIcon{
     transition: all .2s;
     color: #9b9b9b;
 }
 
-.defaultList li:hover .musicIcon{color: #f66470;}
-
-.activePopup {
-    overflow-y: hidden;
-}
-
-.opened {
-    visibility: visible;
-}
+#playlistPopup .defaultList li:hover .musicIcon{color: #f66470;}

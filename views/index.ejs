@@ -8,7 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <link rel="icon" type="image/png" sizes="128x128" href="./assets/images/music.png" />
-    <link rel="stylesheet" href="./assets/css/main.css">
+    <link rel="stylesheet" href="./assets/css/main.css" />
+    <link rel="stylesheet" href="./assets/css/popup.css" />
 </head>
 
 <body>
@@ -17,38 +18,6 @@
 
     </header>
     <section class="constainer">
-        <!-- Add to playlist popup -->
-        <!-- <div class="popup">
-            <div class="innerPopup">
-                <div class="popupHeader">
-                    <div class="heading">Add to palylist</div>
-                    <div class="closePopup material-icons">highlight_off</div>
-                </div>
-                <div class="popupBody">
-                    <div class="newPlaylist">
-                        <div class="inputField">
-                            <input type="text" placeholder="Create new playlist" />
-                            <div class="createNew material-icons">create_new_folder</div>
-                        </div>
-                    </div>
-                    <ul class="defaultList">
-                        <li data-list-name="abc">
-                            <span class="musicIcon material-icons" data-list-name="abc">queue_music</span>
-                            <span class="albumName" data-list-name="abc">Folder name</span>
-                        </li>
-                        <li data-list-name="abc">
-                            <span class="musicIcon material-icons" data-list-name="abc">queue_music</span>
-                            <span class="albumName" data-list-name="abc">Folder name</span>
-                        </li>
-                        <li data-list-name="abc">
-                            <span class="musicIcon material-icons" data-list-name="abc">queue_music</span>
-                            <span class="albumName" data-list-name="abc">Folder name</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div> -->
-
         <!-- click on queue track -->
         <div class="queueMore popupStyle hide">
             <a href="javascript:void(0)">Add to Favorite</a>
@@ -126,6 +95,7 @@
 
     </footer>
     <script src="assets/js/app.js" type="module"></script>
+    <script async src="assets/js/load_popup.js" type="module"></script>
     <!-- <script src="assets/js/socket.io/socket.io.js"></script>
     <script src="assets/js/socket.io-stream.js"></script> -->
     <!-- <script type="module" src="assets/js/bro-fs.js"></script>
