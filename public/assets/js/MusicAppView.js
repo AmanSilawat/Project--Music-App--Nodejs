@@ -74,7 +74,7 @@ class MusicAppView {
         this.el.gridMoreOpt.className += 'gridOpt material-icons';
         fav.className += 'myFav material-icons';
         favPlaylist.className += 'favPlaylist material-icons';
-        favPlaylist.dataset.popup = 'playlistPopup';
+        // favPlaylist.dataset.popup = 'playlistPopup';
         closeBtn.className += 'closeBtn material-icons';
         addToQueue.classList += 'addToQueue material-icons';
 

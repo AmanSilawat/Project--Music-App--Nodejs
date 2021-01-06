@@ -7,24 +7,16 @@ let popupBody = `
                 <div class="createNew material-icons">create_new_folder</div>
             </div>
         </div>
-        <ul class="defaultList">
-            <li data-list-name="abc">
-                <span class="musicIcon material-icons" data-list-name="abc">queue_music</span>
-                <span class="albumName" data-list-name="abc">Folder name</span>
-            </li>
-            <li data-list-name="abc">
-                <span class="musicIcon material-icons" data-list-name="abc">queue_music</span>
-                <span class="albumName" data-list-name="abc">Folder name</span>
-            </li>
-            <li data-list-name="abc">
-                <span class="musicIcon material-icons" data-list-name="abc">queue_music</span>
-                <span class="albumName" data-list-name="abc">Folder name</span>
-            </li>
-        </ul>
+        <ul class="defaultList"></ul>
     </div>`;
 
-new PopupJs({
-    id: 'playlistPopup',
-    headingTxt: 'Add to palylist1',
-    body: popupBody,
-});
+{/* <li data-list-name="abc">
+    <span class="musicIcon material-icons" data-list-name="abc">queue_music</span>
+    <span class="albumName" data-list-name="abc">Folder name</span>
+</li> */}
+
+// new PopupJs({
+//     id: 'playlistPopup',
+//     headingTxt: 'Add to palylist1',
+//     body: popupBody,
+// });

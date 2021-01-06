@@ -38,13 +38,13 @@ class MusicApp {
         this.audio.addEventListener('ended', (event) => this.addPrevAndNext(event));
 
         // load queue class after loading
-        let x = new Promise((resolve, reject) => {
+        let queueData = new Promise((resolve, reject) => {
             let queue = import('./Queue.js').then((data) => new data.default(this));
             resolve(queue);
             reject();
         });
 
-        x.then((queueInstance) => {
+        queueData.then((queueInstance) => {
             this.queue = queueInstance;
         }).catch((reject) => {
             throw `Queue file doesn't load Error: ${reject}`;

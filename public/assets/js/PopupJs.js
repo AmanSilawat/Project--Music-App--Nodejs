@@ -34,7 +34,10 @@ class PopupJs {
         }
 
         // open popup
-        if (e.target.dataset.popup == this.popupEl.id) {
+        console.log(e.target.dataset.popup)
+        console.log(e.target.id)
+        console.log(this.id)
+        if (e.target.dataset.popup == this.id || e.target.id == this.id) {
             this.opened();
         }
     }

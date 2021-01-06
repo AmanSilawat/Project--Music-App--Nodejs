@@ -1,6 +1,7 @@
-class Queue {
+class Queue{
     constructor(musicAppInstance) {
         this.musicApp = musicAppInstance;
+        this.popup = null,
         this.el = {
             playingElBody: null,
             playingElDefaultQueue: null,
@@ -178,7 +179,6 @@ class Queue {
 
     // check track exist or not
     isExistInQueue(config) {
-        console.log(this.list)
         switch (config.queueType) {
             case 'default':
                 return this.list.default.includes(config.directory + config.singleTrack);
@@ -221,16 +221,16 @@ class Queue {
 
                 case 'favorite':
                     if (this.el.favoriteWrap.children('defaultView')) {
-                        
+
                     }
                     this.el.defaultWrap.appendChild(liAncher);
                     this.list.favorite.push(config.directory + config.singleTrack);
                     return 'onlyPlayPause';
-                
+
                 default:
                     return;
             }
-            
+
         }
     }
 
@@ -262,23 +262,26 @@ class Queue {
         nodes.a.append(nodes.queueThumb, nodes.trackName, nodes.removeBtn, nodes.moreOpt);
         nodes.li.appendChild(nodes.a);
 
-        // console.log(config);
-        // console.log(nodes.li);
+        console.log(config)
+        let x = document.getElementById('playlistPopup');
+        x.click();
+    }
 
-        for (const folderCollection of config.tracks) {
-            for (const track of folderCollection.tracks) {
-                const nodesConfig = {
-                    textContent: track.replace(/[-]|\.mp3/g, ' ').trimEnd(),
-                    imgSrc: 'not-available',
-                    dataset: {
-                        datasetType: 'tracklist',
-                        datasetValue: `${folderCollection.directory}/${track}`
-                    }
-                }
-                let node = this.trackHandler(nodesConfig);
-                console.log(node);
-            }
-        }
+    createNewPlaylist() {
+        // for (const folderCollection of config.tracks) {
+        //     for (const track of folderCollection.tracks) {
+        //         const nodesConfig = {
+        //             textContent: track.replace(/[-]|\.mp3/g, ' ').trimEnd(),
+        //             imgSrc: 'not-available',
+        //             dataset: {
+        //                 datasetType: 'tracklist',
+        //                 datasetValue: `${folderCollection.directory}/${track}`
+        //             }
+        //         }
+        //         let node = this.trackHandler(nodesConfig);
+        //         console.log(node);
+        //     }
+        // }
     }
 
     // Handle default and favorite queue
