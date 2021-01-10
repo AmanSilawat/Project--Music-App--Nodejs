@@ -1,17 +1,17 @@
-class Queue{
+class Queue {
     constructor(musicAppInstance) {
         this.musicApp = musicAppInstance;
         this.popup = null,
-        this.el = {
-            playingElBody: null,
-            playingElDefaultQueue: null,
-            playingElFavoriteQueue: null,
-            playlistActive: null,
-            root: document.querySelector('.queuePanel'),
-            defaultWrap: document.querySelector('.queueList'),
-            favoriteWrap: document.querySelector('.favoriteWrap'),
-            playlistWrap: document.querySelector('.playlistWrap')
-        };
+            this.el = {
+                playingElBody: null,
+                playingElDefaultQueue: null,
+                playingElFavoriteQueue: null,
+                playlistActive: null,
+                root: document.querySelector('.queuePanel'),
+                defaultWrap: document.querySelector('.queueList'),
+                favoriteWrap: document.querySelector('.favoriteWrap'),
+                playlistWrap: document.querySelector('.playlistWrap')
+            };
         this.visibity = false;
         this.playInfo = {
             currQueue: null,
@@ -35,6 +35,42 @@ class Queue{
         let drawOtherQueues = new Promise((resolve) => {
             resolve();
         });
+
+        this.fetchPopup('./PopupJs.js')
+            .then(data => {
+                let ndConfig = {};
+                ndConfig.popup = { el: 'div', cls: 'popup closed' };
+                ndConfig.popupLayer = { el: 'div', cls: 'popupLayer' };
+                ndConfig.innerPopup = { el: 'div', cls: 'innerPopup' };
+                ndConfig.popupHeader = { el: 'div', cls: 'popupHeader' };
+                ndConfig.heading = { el: 'div', cls: 'heading', elTxt: "Playlist Popup" };
+                ndConfig.closePopup = { el: 'div', cls: 'closePopup material-icons', elTxt: 'highlight_off' };
+                ndConfig.popupBody = { el: 'div', cls: 'popupBody' };
+
+                let nodes = this.createQueueEl(ndConfig);
+
+                nodes.popupHeader.append(nodes.heading, nodes.closePopup);
+                nodes.innerPopup.append(nodes.popupHeader, nodes.popupBody);
+                nodes.popupLayer.appendChild(nodes.innerPopup);
+                nodes.popup.appendChild(nodes.popupLayer);
+                document.body.prepend(nodes.popup);
+                
+                this.playlistPopup = new data.default(nodes.popup, nodes.popupHeader, nodes.popupBody, this.closePopup);
+            });
+    }
+    
+    closePopup(e) {
+        // close popup on blank area and close button
+        if (e.target.classList.contains('popup') == true || e.target.classList.contains('closePopup') == true) {
+            console.log(this)
+            this.containerElement.classList.add('closed');
+            document.body.classList.remove('activePopup');
+            this.containerElement.removeEventListener("click", this.eventHandler, false);
+        }
+    }
+
+    async fetchPopup(url) {
+        return await import(url).then(promise => promise).catch(err => console.log);
     }
 
     // Listen Event's
@@ -263,8 +299,7 @@ class Queue{
         nodes.li.appendChild(nodes.a);
 
         console.log(config)
-        let x = document.getElementById('playlistPopup');
-        x.click();
+        this.playlistPopup.visible();
     }
 
     createNewPlaylist() {
@@ -318,12 +353,17 @@ class Queue{
     }
 
     // create element with specific configration
-    createNode({ el = null, cls = null, elTxt = null, src = null, href = null, datasetType = null, datasetValue = null }) {
+    createNode({ el = null, cls = null, elTxt = null, src = null, href = null, datasetType = null, datasetValue = null, innerHtml = null, id = null }) {
         const node = document.createElement(el)
 
-        // add class in node
+        // add tag in node
         if (cls != null) {
             node.className += cls;
+        }
+
+        // add id in node
+        if (id != null) {
+            node.id += id;
         }
 
         // add textContent in node
@@ -349,6 +389,11 @@ class Queue{
         // add dataSet and value in node
         if (datasetType != null && datasetValue) {
             node.dataset[datasetType] = datasetValue;
+        }
+
+        // add innerHTML content
+        if (innerHtml != null) {
+            node.innerHTML = innerHtml;
         }
 
         return node;
