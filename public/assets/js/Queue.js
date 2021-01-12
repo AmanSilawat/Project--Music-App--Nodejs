@@ -47,25 +47,57 @@ class Queue {
                 ndConfig.closePopup = { el: 'div', cls: 'closePopup material-icons', elTxt: 'highlight_off' };
                 ndConfig.popupBody = { el: 'div', cls: 'popupBody' };
 
+                // set config for body section
+                ndConfig.newPlaylist = { el: 'div', cls: 'newPlaylist' };
+                ndConfig.inputField = { el: 'div', cls: 'inputField' };
+                ndConfig.createNewList = { el: 'input', cls: 'createNewList', placeTxt: 'Create new playlist' };
+                ndConfig.createNew = { el: 'div', cls: 'createNew material-icons', elTxt: 'create_new_folder' };
+                ndConfig.defaultList = { el: 'ul', cls: 'defaultList' };
+
                 let nodes = this.createQueueEl(ndConfig);
 
+                // set popup body section
+                nodes.inputField.append(nodes.createNewList, nodes.createNew);
+                nodes.newPlaylist.appendChild(nodes.inputField);
+                nodes.popupBody.append(nodes.newPlaylist, nodes.defaultList)
+
+                // set header and outer layers
                 nodes.popupHeader.append(nodes.heading, nodes.closePopup);
                 nodes.innerPopup.append(nodes.popupHeader, nodes.popupBody);
                 nodes.popupLayer.appendChild(nodes.innerPopup);
                 nodes.popup.appendChild(nodes.popupLayer);
+
                 document.body.prepend(nodes.popup);
-                
-                this.playlistPopup = new data.default(nodes.popup, nodes.popupHeader, nodes.popupBody, this.closePopup);
+
+                this.playlistPopup = new data.default(nodes.popup, nodes.popupHeader, nodes.popupBody, this);
             });
     }
-    
-    closePopup(e) {
+
+    popupEventHandler(e) {
         // close popup on blank area and close button
         if (e.target.classList.contains('popup') == true || e.target.classList.contains('closePopup') == true) {
-            console.log(this)
+            console.log(this.eventHandler)
             this.containerElement.classList.add('closed');
             document.body.classList.remove('activePopup');
             this.containerElement.removeEventListener("click", this.eventHandler, false);
+        }
+
+        // create playlist
+        if (e.target.classList.contains('createNew') == true) {
+            let inputEl = e.target.previousElementSibling;
+            if (inputEl.tagName.toLowerCase() == 'input') {
+                let inputValue = inputEl.value.trim();
+                if (inputValue != '') {
+                    this.queueReference.list.playlist.push(inputValue);
+                    console.log(this.queueReference.list.playlist);
+                } else {
+                    inputEl.parentElement.classList.add('shake');
+                    inputEl.parentElement.onanimationend = function () {
+                        this.classList.remove('shake');
+                    }
+                }
+            }
+            
         }
     }
 
@@ -299,6 +331,7 @@ class Queue {
         nodes.li.appendChild(nodes.a);
 
         console.log(config)
+
         this.playlistPopup.visible();
     }
 
@@ -353,7 +386,18 @@ class Queue {
     }
 
     // create element with specific configration
-    createNode({ el = null, cls = null, elTxt = null, src = null, href = null, datasetType = null, datasetValue = null, innerHtml = null, id = null }) {
+    createNode({
+        el = null,
+        cls = null,
+        elTxt = null,
+        src = null,
+        href = null,
+        datasetType = null,
+        datasetValue = null,
+        innerHtml = null,
+        id = null,
+        placeTxt = null
+    }) {
         const node = document.createElement(el)
 
         // add tag in node
@@ -394,6 +438,11 @@ class Queue {
         // add innerHTML content
         if (innerHtml != null) {
             node.innerHTML = innerHtml;
+        }
+
+        // add placeholder text
+        if (placeTxt != null) {
+            node.placeholder = placeTxt;
         }
 
         return node;

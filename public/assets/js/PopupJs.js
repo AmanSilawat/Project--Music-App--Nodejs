@@ -1,9 +1,12 @@
 class PopupJs {
-    constructor(container, header, body, eventHandler) {
+    constructor(container, header, body, queueReference) {
         this.containerElement = container;
         this.headerElement = header;
         this.bodyElement = body;
-        this.eventHandler = eventHandler;
+        this.queueReference = queueReference;
+
+        // Each time you call this.clicked.bind(this), it returns a new and different function.
+        this.clickHandler = this.queueReference.popupEventHandler.bind(this);
     }
 
     set header(header) {
@@ -28,8 +31,9 @@ class PopupJs {
     }
 
     listener() {
-        this.containerElement.addEventListener('click', this.eventHandler.bind(this));
+        this.containerElement.addEventListener('click', this.clickHandler);
     }
+
 }
 
 export default PopupJs;

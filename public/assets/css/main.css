@@ -759,11 +759,11 @@ a {
 }
 
 /* popup  */
-#playlistPopup .inputField {
+.popup .inputField {
     position: relative;
 }
 
-#playlistPopup .inputField input {
+.popup .inputField input {
     width: 100%;
     font-size: 17px;
     padding: 5px 30px 5px 10px;
@@ -772,9 +772,14 @@ a {
     border: 1px solid #ababab;
     outline: none;
     border-radius: 3px;
+    transition: all .3s;
 }
 
-#playlistPopup .createNew {
+.popup .inputField input::placeholder {
+    transition: all .3s;
+}
+
+.popup .createNew {
     color: #f66470;
     position: absolute;
     right: 5px;
@@ -785,16 +790,16 @@ a {
     transition: all .3s;
 }
 
-#playlistPopup .createNew:hover {
+.popup .createNew:hover {
     color: #ff0000;
 
 }
 
-#playlistPopup .defaultList {
+.popup .defaultList {
     list-style-type: none;
 }
 
-#playlistPopup .defaultList li {
+.popup .defaultList li {
     padding: 10px 15px;
     display: flex;
     align-items: center;
@@ -802,17 +807,52 @@ a {
     transition: all .2s;
 }
 
-#playlistPopup .defaultList li:hover {
+.popup .defaultList li:hover {
     background-color: #e5e5e5;
 }
 
-#playlistPopup .defaultList .albumName {
+.popup .defaultList .albumName {
     padding-left: 5px;
 }
 
-#playlistPopup .defaultList .musicIcon{
+.popup .defaultList .musicIcon{
     transition: all .2s;
     color: #9b9b9b;
 }
 
-#playlistPopup .defaultList li:hover .musicIcon{color: #f66470;}
+.popup .defaultList li:hover .musicIcon{color: #f66470;}
+
+
+/* shake animation */
+.shake {
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.shake .createNewList {
+    border-color: #ff0000 !important;
+}
+
+.shake .createNewList::placeholder {
+    color: #ff0000 !important;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
