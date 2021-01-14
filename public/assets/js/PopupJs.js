@@ -14,7 +14,8 @@ class PopupJs {
     }
 
     set body(body) {
-        this.bodyElement = body;
+        // this.bodyElement.innerHTML = '';
+        this.bodyElement.appendChild(body);
     }
 
     get header() {
@@ -27,7 +28,13 @@ class PopupJs {
 
     visible() {
         this.containerElement.classList.remove('closed');
-        this.listener();    
+        this.listener();
+    }
+
+    hidden() {
+        this.containerElement.classList.add('closed');
+        document.body.classList.remove('activePopup');
+        this.containerElement.removeEventListener("click", this.eventHandler, false);
     }
 
     listener() {

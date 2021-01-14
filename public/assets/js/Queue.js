@@ -20,7 +20,7 @@ class Queue {
         this.list = {
             default: [],
             favorite: [],
-            playlist: []
+            playlist: {}
         }
 
         // initialization
@@ -69,17 +69,14 @@ class Queue {
 
                 document.body.prepend(nodes.popup);
 
-                this.playlistPopup = new data.default(nodes.popup, nodes.popupHeader, nodes.popupBody, this);
+                this.playlistPopup = new data.default(nodes.popup, nodes.popupHeader, nodes.defaultList, this);
             });
     }
 
     popupEventHandler(e) {
         // close popup on blank area and close button
         if (e.target.classList.contains('popup') == true || e.target.classList.contains('closePopup') == true) {
-            console.log(this.eventHandler)
-            this.containerElement.classList.add('closed');
-            document.body.classList.remove('activePopup');
-            this.containerElement.removeEventListener("click", this.eventHandler, false);
+            this.hidden();
         }
 
         // create playlist
@@ -88,8 +85,30 @@ class Queue {
             if (inputEl.tagName.toLowerCase() == 'input') {
                 let inputValue = inputEl.value.trim();
                 if (inputValue != '') {
-                    this.queueReference.list.playlist.push(inputValue);
-                    console.log(this.queueReference.list.playlist);
+                    if (!this.queueReference.list.playlist[inputValue]) {
+                        this.hidden();
+                        let loadSomeTime = (params) => {    
+                            let frag = document.createDocumentFragment();
+                            
+                            let ndConfig = {};
+                            ndConfig.li = { el: 'li' };
+                            ndConfig.musicIcon = { el: 'span', cls: 'musicIcon material-icons', elTxt: 'queue_music' };
+                            ndConfig.text = { el: 'span', cls: 'albumName', elTxt: inputValue };
+                            
+                            let nodes2 = this.queueReference.createQueueEl(ndConfig);
+                            nodes2.li.append(nodes2.musicIcon, nodes2.text);
+                            frag.appendChild(nodes2.li);
+                            
+                            this.body = frag;
+                            console.log(frag);
+                            this.queueReference.list.playlist[inputValue] = this.data;
+                            inputEl.value = '';
+                        }
+                        setTimeout(loadSomeTime, 500);
+
+                    } else {
+                        alert(`Already Exist: "${inputValue}"`);
+                    }
                 } else {
                     inputEl.parentElement.classList.add('shake');
                     inputEl.parentElement.onanimationend = function () {
@@ -97,12 +116,16 @@ class Queue {
                     }
                 }
             }
-            
+
         }
     }
 
     async fetchPopup(url) {
         return await import(url).then(promise => promise).catch(err => console.log);
+    }
+
+    popupListGenrate() {
+        
     }
 
     // Listen Event's
@@ -255,7 +278,7 @@ class Queue {
                 return this.list.favorite.includes(config.directory + config.singleTrack);
 
             case 'playlist':
-                return this.list.playlist.includes(config.directory + config.singleTrack);
+            // return this.list.playlist.includes(config.directory + config.singleTrack);
 
             default:
                 return false;
@@ -330,8 +353,7 @@ class Queue {
         nodes.a.append(nodes.queueThumb, nodes.trackName, nodes.removeBtn, nodes.moreOpt);
         nodes.li.appendChild(nodes.a);
 
-        console.log(config)
-
+        this.playlistPopup.data = config;
         this.playlistPopup.visible();
     }
 
