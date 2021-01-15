@@ -86,26 +86,30 @@ class Queue {
                 let inputValue = inputEl.value.trim();
                 if (inputValue != '') {
                     if (!this.queueReference.list.playlist[inputValue]) {
+                        this.queueReference.list.playlist[inputValue] = this.data;
                         this.hidden();
-                        let loadSomeTime = (params) => {    
+                        let loadSomeTime = () => {
                             let frag = document.createDocumentFragment();
-                            
+
                             let ndConfig = {};
                             ndConfig.li = { el: 'li' };
                             ndConfig.musicIcon = { el: 'span', cls: 'musicIcon material-icons', elTxt: 'queue_music' };
                             ndConfig.text = { el: 'span', cls: 'albumName', elTxt: inputValue };
-                            
+
                             let nodes2 = this.queueReference.createQueueEl(ndConfig);
                             nodes2.li.append(nodes2.musicIcon, nodes2.text);
                             frag.appendChild(nodes2.li);
-                            
+
                             this.body = frag;
-                            console.log(frag);
-                            this.queueReference.list.playlist[inputValue] = this.data;
                             inputEl.value = '';
                         }
+                        // empty input text & add list
                         setTimeout(loadSomeTime, 500);
 
+                        // generate playlist
+
+                        this.queueReference.playlistCreator({ inputValue });
+                        console.log(this.queueReference.list.playlist)
                     } else {
                         alert(`Already Exist: "${inputValue}"`);
                     }
@@ -116,7 +120,6 @@ class Queue {
                     }
                 }
             }
-
         }
     }
 
@@ -125,7 +128,54 @@ class Queue {
     }
 
     popupListGenrate() {
-        
+        // ..
+    }
+
+    playlistCreator({ inputValue, trackList }) {
+        let folderConfig = {
+            elTxt: inputValue,
+            imgSrc: 'assets/images/no-image-available.jpg',
+            dataset: {
+                datasetType: 'playlistGrp',
+                datasetValue: inputValue
+            }
+        }
+        let parentNode = this.folderHandler(folderConfig);
+        let ul = this.createNode({ el: 'ul', cls: 'queueList' });
+        let backButtonWrapper = this.createNode({ el: 'div', cls: 'backWrapper' });
+        let buttonText = this.createNode({ el: 'div', cls: 'trackName', elTxt: "Go to previous" });
+        let backButton = this.createNode({ el: 'div', cls: 'backBtn material-icons', elTxt: 'arrow_back' });
+
+        // add back button in child track list
+        backButtonWrapper.append(backButton, buttonText);
+        ul.appendChild(backButtonWrapper);
+
+        // create multiple track list
+        for (const dir of this.list.playlist[inputValue]) {
+            for (const track of dir.tracks) {
+
+                // create node config
+                const nodesConfig = {
+                    textContent: track.replace(/.mp3$/, ''),
+                    imgSrc: `assets/images/no-image-available.jpg`,
+                    dataset: {
+                        datasetType: 'tracklist',
+                        datasetValue: `${dir.directory}/${track}`
+                    }
+                }
+                // get track node and append
+                ul.appendChild(this.trackHandler(nodesConfig));
+            }
+        }
+
+        parentNode.appendChild(ul)
+        this.el.playlistWrap.appendChild(parentNode);
+        console.log(parentNode);
+
+        let defaultViewNode = this.el.playlistWrap.querySelector('.defaultView');
+        if (defaultViewNode != null) {
+            defaultViewNode.remove();
+        }
     }
 
     // Listen Event's
@@ -287,9 +337,11 @@ class Queue {
 
     // if is exist queue
     addInQueue(config) {
+        console.log(config);
         // handle folders otherwise tracks
         if (config.isFolder == true) {
-            this.folderHandler(config);
+            this.playlistPopup.data = config.tracks;
+            this.playlistPopup.visible();
         } else {
             // create node config
             const nodesConfig = {
@@ -326,14 +378,7 @@ class Queue {
     }
 
     // Handle playlist 
-    folderHandler(config) {
-        const elTxt = config.mainEle.querySelector('.gridHead').textContent;
-        const imgSrc = config.mainEle.querySelector('.blobImg').src;
-        const dataset = {
-            datasetType: 'playlistGrp',
-            datasetValue: config.directory
-        }
-
+    folderHandler({ elTxt, imgSrc, dataset }) {
         // create elements
         // ? All Properties of obj { el, cls, elTxt, src, href, datasetType, datasetValue }
         const li = { el: 'li', cls: 'rowTrack' };
@@ -352,9 +397,7 @@ class Queue {
         nodes.queueThumb.append(nodes.img, nodes.backBtn);
         nodes.a.append(nodes.queueThumb, nodes.trackName, nodes.removeBtn, nodes.moreOpt);
         nodes.li.appendChild(nodes.a);
-
-        this.playlistPopup.data = config;
-        this.playlistPopup.visible();
+        return nodes.li;
     }
 
     createNewPlaylist() {
@@ -670,14 +713,32 @@ class Queue {
 
     toggleInnerPlaylist(e) {
         // add active class
-        let aTag = this.musicApp.get_target_ancher(e.path, 'a')
-        aTag.parentElement.classList.toggle('deActive');
+        let current = this.musicApp.get_target_ancher(e.path, 'a').parentElement;
+        let nextSibling = current.nextElementSibling;
+        let prevSibling = current.previousElementSibling;
+
+        while (nextSibling) {
+            nextSibling.classList.remove('activeList');
+            nextSibling = nextSibling.nextElementSibling;
+        }
+        while (prevSibling) {
+            prevSibling.classList.remove('activeList');
+            prevSibling = prevSibling.prevSibling;
+        }
+
+        current.classList.toggle('activeList');
+        if (current.classList.contains('activeList') == true) {
+            current.parentElement.classList.add('containActive');
+        } else {
+            current.parentElement.classList.remove('containActive');
+        }
+        
 
         // add back button 
-        let imgTag = aTag.querySelector('.queueThumb');
-        imgTag.removeAttribute('data-playlist-grp');
+        // let imgTag = aTag.querySelector('.queueThumb');
+        // imgTag.removeAttribute('data-playlist-grp');
         // imgTag.innerHTML = '';
-        imgTag.appendChild(backBtn);
+        // imgTag.appendChild(backBtn);
 
 
     }

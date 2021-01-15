@@ -647,10 +647,11 @@ a {
     top: 0;
 }
 
-.favoriteWrap, .playlistWrap, .playlistWrap .defaultView {
+/* .favoriteWrap, .defaultView,
+.playlistWrap .defaultView {
     left: 500px;
     top: 0px;
-}
+} */
 
 /* favoriteActive */
 .favoriteWrap .defaultView, .playlistWrap .defaultView {
@@ -661,13 +662,21 @@ a {
     font-weight: 500;
 }
 
+.queuePanel .favoriteWrap, .queuePanel .playlistWrap {
+    left: -500px;
+}
+
 .favoriteActive .favoriteWrap, .playlistActive .playlistWrap {
     left: 0px;
 }
 
 .favoriteActive .defaultWrap, .playlistActive .defaultWrap {
-    left: -500px;
+    left: 500px;
 }
+
+/* .playlistActive .favoriteWrap, .playlistActive .defaultWrap {
+    left: -500px;
+} */
 
 /* active playlist queue */
 
@@ -688,9 +697,9 @@ a {
     z-index: 10;
 }
 
-.deActive > .queueItem + ul {
+/* .deActive > .queueItem + ul {
     top: -251px;
-}
+} */
 
 /* .queueHeader::after {
     position: absolute;
@@ -750,12 +759,11 @@ a {
     transition: all .3s ease-in .7s;
 }
 
-.deActive.innerTracks > a img{
-    left: 0px;
-}
 
 .playlistWrap > li {
-    position: relative;
+    position: unset;
+    left: 0%;
+    transition: all .3s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 /* popup  */
@@ -855,4 +863,59 @@ a {
   40%, 60% {
     transform: translate3d(4px, 0, 0);
   }
+}
+
+.rowTrack .queueList{
+    position: relative;
+}
+
+/* .rowTrack .queueList{
+    display: none;
+}
+
+.activeList .queueList {
+    display: block;
+} */
+
+
+
+.queueList.containActive {
+    left: -100%;
+}
+
+.playlistWrap.containActive > li {
+    left: 0px;
+}
+
+.playlistWrap > li > ul {
+    position: absolute !important;
+    left: 1000px;
+    top: 0;
+}
+
+.playlistWrap > li.activeList > ul {
+    left: 100%;
+}
+
+.backWrapper .backBtn {
+    position: unset;
+    padding: 2px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.backWrapper .trackName {
+    display: inline-block;
+    padding-left: 9px;
+    font-size: 14px;
+}
+
+.backWrapper {
+    padding: 5px 0px 5px 6px;
+    margin-bottom: 10px;
+    margin-top: -10px;
+    display: flex;
+    align-items: center;
+    background: #f4f4f4;
+    cursor: pointer;
 }
