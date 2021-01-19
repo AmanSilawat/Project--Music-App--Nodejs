@@ -50,7 +50,7 @@ class MusicAppView {
 
                 // // add back button
                 let backBtn = document.createElement('div')
-                backBtn.className += 'backBtn material-icons';
+                backBtn.className += 'backBtn backBtnStyle material-icons';
                 backBtn.textContent = 'arrow_back';
                 currentGroup.insertAdjacentElement('afterbegin', backBtn);
 

@@ -492,7 +492,7 @@ a {
     display: none;
 }
 
-.backBtn {
+.backBtnStyle {
     position: absolute;
     left: -38px;
     top: -4px;
@@ -505,7 +505,7 @@ a {
     border: 1px solid #9f9f9f;
 }
 
-.backBtn:hover {
+.backBtnStyle:hover {
     background-color: #e73838;
     border-color: #e73838;
     color: #fff;
@@ -626,7 +626,11 @@ a {
     display: flex;
     align-items: center;
     background-color: #fff;
-    padding-bottom: 8px;
+    padding: 4px 0px;
+}
+
+.queueList .queueItem:hover {
+    background-color: #f7f7f7;
 }
 
 /* .queueHeader */
@@ -723,7 +727,7 @@ a {
     background-color: #6e6e6e5b;
 } */
 
-.innerTracks .backBtn {
+.innerTracks .backBtnStyle {
     font-size: 26px;
     border-radius: 50%;
     padding: 3px;
@@ -737,7 +741,7 @@ a {
     z-index: -1;
 }
 
-.deActive.innerTracks .backBtn {
+.deActive.innerTracks .backBtnStyle {
     left: -50%;
 }
 
@@ -897,7 +901,7 @@ a {
     left: 100%;
 }
 
-.backWrapper .backBtn {
+.backWrapper .backBtnStyle {
     position: unset;
     padding: 2px;
     font-size: 15px;

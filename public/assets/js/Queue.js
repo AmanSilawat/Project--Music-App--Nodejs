@@ -109,7 +109,6 @@ class Queue {
                         // generate playlist
 
                         this.queueReference.playlistCreator({ inputValue });
-                        console.log(this.queueReference.list.playlist)
                     } else {
                         alert(`Already Exist: "${inputValue}"`);
                     }
@@ -144,7 +143,7 @@ class Queue {
         let ul = this.createNode({ el: 'ul', cls: 'queueList' });
         let backButtonWrapper = this.createNode({ el: 'div', cls: 'backWrapper' });
         let buttonText = this.createNode({ el: 'div', cls: 'trackName', elTxt: "Go to previous" });
-        let backButton = this.createNode({ el: 'div', cls: 'backBtn material-icons', elTxt: 'arrow_back' });
+        let backButton = this.createNode({ el: 'div', cls: 'prevListBtn backBtnStyle material-icons', elTxt: 'arrow_back' });
 
         // add back button in child track list
         backButtonWrapper.append(backButton, buttonText);
@@ -170,7 +169,6 @@ class Queue {
 
         parentNode.appendChild(ul)
         this.el.playlistWrap.appendChild(parentNode);
-        console.log(parentNode);
 
         let defaultViewNode = this.el.playlistWrap.querySelector('.defaultView');
         if (defaultViewNode != null) {
@@ -337,7 +335,7 @@ class Queue {
 
     // if is exist queue
     addInQueue(config) {
-        console.log(config);
+        // console.log(config)
         // handle folders otherwise tracks
         if (config.isFolder == true) {
             this.playlistPopup.data = config.tracks;
@@ -639,21 +637,21 @@ class Queue {
     }
 
     setConfigQueue(e, config) {
+        console.log(config)
         let mainEl = this.musicApp.get_target_ancher(e.path, 'a');
-        const isFolder = mainEl.dataset.img == undefined ? false : true;
 
         // Add or modify configration setting
         config.mainEle = mainEl;
         config.isPlay = config.isPlay || false;
-        config.isFolder = isFolder;
 
         // check folder or not
-        if (isFolder == false) {
+        if (config.isFolder == false) {
             let regex = mainEl.dataset.tracklist.match(/(.*\/)(\b[-\w]+.mp3)$/);
             config.directory = regex[1]
             config.singleTrack = regex[2];
         } else {
             const tracks = this.getMusicTracks(mainEl);
+            console.log(tracks);
             config.tracks = tracks;
             config.directory = ('img' in mainEl.dataset) ? mainEl.dataset.img : mainEl.dataset.tracklist;
         }
@@ -663,7 +661,13 @@ class Queue {
     }
 
     getMusicTracks(anchor_ele) {
-        const testData = anchor_ele.dataset.img.split('/');
+        let testData;
+        if (typeof anchor_ele.dataset.img != 'undefined') {
+            testData = anchor_ele.dataset.img.split('/');
+        } else {
+            testData = /(.*)\/(.*)/g.exec(anchor_ele.dataset.tracklist)
+            return [{ directory: testData[1], tracks: [testData[2]] }]
+        }
         const data = this.musicApp.musicAppViewInstance.musicDir;
         const cloneData = JSON.parse(JSON.stringify(data));
 
@@ -732,7 +736,7 @@ class Queue {
         } else {
             current.parentElement.classList.remove('containActive');
         }
-        
+
 
         // add back button 
         // let imgTag = aTag.querySelector('.queueThumb');
@@ -741,6 +745,13 @@ class Queue {
         // imgTag.appendChild(backBtn);
 
 
+    }
+
+    playlistSubListBack(e) {
+        const playlistWrap = document.querySelector('.playlistWrap');
+        const rowTrack = playlistWrap.querySelector('.activeList');
+        playlistWrap.classList.remove('containActive')
+        rowTrack.classList.remove('activeList')
     }
 }
 export default Queue;

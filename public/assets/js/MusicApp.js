@@ -100,7 +100,7 @@ class MusicApp {
 
         // add to queue
         if (e.target.classList.contains('addToQueue') == true) {
-            const config = { queueType: "favorite" }
+            const config = { queueType: "favorite", isFolder: false }
             this.queue.setConfigQueue(e, config);
         }
 
@@ -121,19 +121,27 @@ class MusicApp {
 
         // add to favorite queue
         if (e.target.classList.contains('myFav') == true) {
-            const config = { queueType: "favorite" }
+            const config = { queueType: "favorite", isFolder: false }
             this.queue.setConfigQueue(e, config);
         }
 
         // add to playlist queue
         if (e.target.classList.contains('favPlaylist') == true) {
-            const config = { queueType: "playlist" }
+            const config = { queueType: "playlist", isFolder: true }
             this.queue.setConfigQueue(e, config);
         }
 
         // add to playlist queue
         if (e.target.hasAttribute('data-playlist-grp') == true) {
             this.queue.toggleInnerPlaylist(e);
+        }
+
+        // click on playlist sub list back button
+        if (
+            e.target.classList.contains('backWrapper') == true ||
+            e.target.parentElement.classList.contains('backWrapper') == true
+        ) {
+            this.queue.playlistSubListBack(e);
         }
     }
 
@@ -197,7 +205,8 @@ class MusicApp {
         // define config for queue handler
         const config = {
             queueType: "default",
-            isPlay: true
+            isPlay: true,
+            isFolder: false
         }
         const changeMusic = this.queue.setConfigQueue(e, config);
 
