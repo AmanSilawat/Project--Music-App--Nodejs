@@ -92,7 +92,7 @@ class Queue {
                             let frag = document.createDocumentFragment();
 
                             let ndConfig = {};
-                            ndConfig.li = { el: 'li' };
+                            ndConfig.li = { el: 'li', cls: 'userFavPlaylist' };
                             ndConfig.musicIcon = { el: 'span', cls: 'musicIcon material-icons', elTxt: 'queue_music' };
                             ndConfig.text = { el: 'span', cls: 'albumName', elTxt: inputValue };
 
@@ -108,7 +108,7 @@ class Queue {
 
                         // generate playlist
 
-                        this.queueReference.playlistCreator({ inputValue });
+                        this.queueReference.playlistCreator({ inputValue, trackList: this.data });
                     } else {
                         alert(`Already Exist: "${inputValue}"`);
                     }
@@ -120,6 +120,29 @@ class Queue {
                 }
             }
         }
+
+        // append on specific list
+        if (
+            e.target.classList.contains('userFavPlaylist') == true ||
+            e.target.parentElement.classList.contains('userFavPlaylist') == true
+        ) {
+            console.log('--if--');
+            const currentList = e.target.classList.contains('userFavPlaylist')
+                ? e.target.querySelector('.albumName')
+                : e.target.parentElement.querySelector('.albumName');
+            this.queueReference.subPlaylistCreator({ appendIn: currentList.textContent, trackList: this.data });
+            this.hidden();
+        }
+    }
+
+    subPlaylistCreator({ appendIn, trackList }) {
+        this.el.playlistWrap.querySelector(`[data-playlist-grp="${appendIn}"]`)
+            .nextElementSibling.appendChild(
+                this.popSubListGenerator(appendIn, trackList)
+            );
+
+        // added in playlist queue
+        this.list.playlist[appendIn].push(...trackList);
     }
 
     async fetchPopup(url) {
@@ -150,22 +173,7 @@ class Queue {
         ul.appendChild(backButtonWrapper);
 
         // create multiple track list
-        for (const dir of this.list.playlist[inputValue]) {
-            for (const track of dir.tracks) {
-
-                // create node config
-                const nodesConfig = {
-                    textContent: track.replace(/.mp3$/, ''),
-                    imgSrc: `assets/images/no-image-available.jpg`,
-                    dataset: {
-                        datasetType: 'tracklist',
-                        datasetValue: `${dir.directory}/${track}`
-                    }
-                }
-                // get track node and append
-                ul.appendChild(this.trackHandler(nodesConfig));
-            }
-        }
+        ul.appendChild(this.popSubListGenerator(inputValue));
 
         parentNode.appendChild(ul)
         this.el.playlistWrap.appendChild(parentNode);
@@ -174,6 +182,25 @@ class Queue {
         if (defaultViewNode != null) {
             defaultViewNode.remove();
         }
+    }
+
+    popSubListGenerator(currentListName, trackList = undefined) {
+        let fragment = document.createDocumentFragment();
+        const currentTrackList = trackList || this.list.playlist[currentListName]
+        for (const track of currentTrackList) {
+            // create node config
+            const nodesConfig = {
+                textContent: /.*\/(.*).mp3/.exec(track)[1].replace(/-/g, ' '),
+                imgSrc: `assets/images/no-image-available.jpg`,
+                dataset: {
+                    datasetType: 'tracklist',
+                    datasetValue: track
+                }
+            }
+            // get track node and append
+            fragment.appendChild(this.trackHandler(nodesConfig));
+        }
+        return fragment;
     }
 
     // Listen Event's
@@ -335,7 +362,6 @@ class Queue {
 
     // if is exist queue
     addInQueue(config) {
-        // console.log(config)
         // handle folders otherwise tracks
         if (config.isFolder == true) {
             this.playlistPopup.data = config.tracks;
@@ -604,15 +630,28 @@ class Queue {
 
     // Add to favorite Queue
     toggleToFav(e, type) {
+        let subPlaylistParent, innerList;
         switch (type) {
             case 'favorite':
                 this.el.root.classList.toggle('favoriteActive');
                 this.el.root.classList.remove('playlistActive');
+
+                // remove sub playlist active class
+                if (this.el.playlistWrap.classList.contains('containActive') == true) {
+                    this.el.playlistWrap.classList.remove('containActive');
+                    this.el.playlistWrap.querySelector('.activeList').classList.remove('activeList')
+                }
                 break;
 
             case 'playlist':
                 this.el.root.classList.toggle('playlistActive');
                 this.el.root.classList.remove('favoriteActive');
+
+                // remove sub playlist active class
+                if (this.el.playlistWrap.classList.contains('containActive') == true) {
+                    this.el.playlistWrap.classList.remove('containActive');
+                    this.el.playlistWrap.querySelector('.activeList').classList.remove('activeList')
+                }
                 break;
 
             default:
@@ -637,7 +676,6 @@ class Queue {
     }
 
     setConfigQueue(e, config) {
-        console.log(config)
         let mainEl = this.musicApp.get_target_ancher(e.path, 'a');
 
         // Add or modify configration setting
@@ -651,7 +689,6 @@ class Queue {
             config.singleTrack = regex[2];
         } else {
             const tracks = this.getMusicTracks(mainEl);
-            console.log(tracks);
             config.tracks = tracks;
             config.directory = ('img' in mainEl.dataset) ? mainEl.dataset.img : mainEl.dataset.tracklist;
         }
@@ -665,8 +702,7 @@ class Queue {
         if (typeof anchor_ele.dataset.img != 'undefined') {
             testData = anchor_ele.dataset.img.split('/');
         } else {
-            testData = /(.*)\/(.*)/g.exec(anchor_ele.dataset.tracklist)
-            return [{ directory: testData[1], tracks: [testData[2]] }]
+            return [anchor_ele.dataset.tracklist]
         }
         const data = this.musicApp.musicAppViewInstance.musicDir;
         const cloneData = JSON.parse(JSON.stringify(data));
@@ -700,11 +736,8 @@ class Queue {
             }
 
             if (lastVal.type == 'track') {
-                let obj = {
-                    directory: lastVal.path,
-                    tracks: [...lastVal.tracks]
-                };
-                result.push(obj);
+                let trackPath = lastVal.tracks.map(el => `${lastVal.path}/${el}`);
+                result.push(...trackPath);
             }
 
             return tracks(data, result);
