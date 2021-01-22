@@ -923,3 +923,8 @@ a {
     background: #f4f4f4;
     cursor: pointer;
 }
+
+.favoriteType {
+    position: relative;
+    margin-bottom: 20px;
+}

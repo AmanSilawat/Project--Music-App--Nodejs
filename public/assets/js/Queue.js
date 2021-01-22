@@ -19,7 +19,10 @@ class Queue {
         };
         this.list = {
             default: [],
-            favorite: [],
+            favorite: {
+                songs: [],
+                albums: []
+            },
             playlist: {}
         }
 
@@ -92,7 +95,9 @@ class Queue {
                             let frag = document.createDocumentFragment();
 
                             let ndConfig = {};
-                            ndConfig.li = { el: 'li', cls: 'userFavPlaylist' };
+                            ndConfig.li = {
+                                el: 'li', cls: 'userFavPlaylist', datasetType: 'playlistName', datasetValue: inputValue
+                            };
                             ndConfig.musicIcon = { el: 'span', cls: 'musicIcon material-icons', elTxt: 'queue_music' };
                             ndConfig.text = { el: 'span', cls: 'albumName', elTxt: inputValue };
 
@@ -350,7 +355,12 @@ class Queue {
                 return this.list.default.includes(config.directory + config.singleTrack);
 
             case 'favorite':
-                return this.list.favorite.includes(config.directory + config.singleTrack);
+                console.log(config)
+                if (config.isFolder == true) {
+                    // ..
+                } else {
+                    return this.list.favorite.songs.includes(config.directory + config.singleTrack);
+                }
 
             case 'playlist':
             // return this.list.playlist.includes(config.directory + config.singleTrack);
@@ -387,12 +397,14 @@ class Queue {
                     return 'chnageMusic';
 
                 case 'favorite':
-                    if (this.el.favoriteWrap.children('defaultView')) {
-
+                    if (this.el.favoriteWrap.children[0].classList.contains('defaultView') == true) {
+                        // Favorite Default view is not Contains
+                        console.log('Favorite Default view is not Contains');
+                    } else {
+                       this.el.defaultWrap.appendChild(liAncher);
+                        this.list.favorite.push(config.directory + config.singleTrack);
+                        return 'onlyPlayPause';
                     }
-                    this.el.defaultWrap.appendChild(liAncher);
-                    this.list.favorite.push(config.directory + config.singleTrack);
-                    return 'onlyPlayPause';
 
                 default:
                     return;
@@ -537,24 +549,44 @@ class Queue {
         return node;
     }
 
-    // revove to queue
+    // remove to queue
     removeToQueue(e) {
-        let wrapperMusicNodes = this.musicApp.get_target_ancher(e.path, 'a');
+        let wrapperMusicNode = this.musicApp.get_target_ancher(e.path, 'a');
+        console.log(wrapperMusicNode);
 
         // remove on DOM
-        let rootMusicEl = wrapperMusicNodes.parentElement;
+        let rootMusicEl = wrapperMusicNode.parentElement;
+        let wrapElement = rootMusicEl.parentElement;
+        // remove on queue
+        console.log(wrapElement);
+        if (wrapElement.classList.contains('defaultWrap') == true) {
+            let indexPos = this.list.default.indexOf(wrapperMusicNode.dataset.tracklist);
+            this.list.default.splice(indexPos, 1);
+        } else if (wrapElement.classList.contains('favoriteWrap') == true) {
+            let indexPos = this.list.favorite.indexOf(wrapperMusicNode.dataset.tracklist);
+            this.list.favorite.splice(indexPos, 1);
+            if (this.list.default.length == 0) {
+                wrapElement.appendChild(this.addDefaultQueueListNode("Favorite"));
+            }
+        } else if (wrapElement.classList.contains('playlistWrap') == true) {
+            delete this.list.playlist[wrapperMusicNode.dataset.playlistGrp];
+            let arr = this.playlistPopup.body.querySelectorAll('[data-playlist-name]');
+            for (const el of arr) {
+                if (el.dataset.playlistName == wrapperMusicNode.dataset.playlistGrp) {
+                    el.remove();
+                    if (Object.keys(this.list.playlist).length == 0) {
+                        wrapElement.appendChild(this.addDefaultQueueListNode("Playlist"));
+                    }
+                    break;
+                }
+            }
+        }
         rootMusicEl.remove();
 
-        let wrapElement = this.musicApp.get_target_ancher(e.path, '.queueList');
-        // remove on queue
-        if (wrapElement.classList.contains('defaultWrap') == true) {
-            let indexPos = this.default.indexOf(wrapperMusicNode.dataset.tracklist);
-            this.default.splice(indexPos, 1);
-        } else if (wrapElement.classList.contains('favoriteWrap') == true) {
-            let indexPos = this.favorite.indexOf(wrapperMusicNode.dataset.tracklist);
-            this.favorite.splice(indexPos, 1);
-        }
+    }
 
+    addDefaultQueueListNode(listType) {
+        return this.createNode({ el: 'li', cls: 'defaultView', elTxt: `${listType} queue is empty` });
     }
 
     // remove active playing class
@@ -684,6 +716,7 @@ class Queue {
 
         // check folder or not
         if (config.isFolder == false) {
+            console.log(mainEl)
             let regex = mainEl.dataset.tracklist.match(/(.*\/)(\b[-\w]+.mp3)$/);
             config.directory = regex[1]
             config.singleTrack = regex[2];
