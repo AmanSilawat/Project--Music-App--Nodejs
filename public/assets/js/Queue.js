@@ -169,7 +169,7 @@ class Queue {
         }
         let parentNode = this.folderHandler(folderConfig);
         let ul = this.createNode({ el: 'ul', cls: 'queueList' });
-        let backButtonWrapper = this.createNode({ el: 'div', cls: 'backWrapper' });
+        let backButtonWrapper = this.createNode({ el: 'div', cls: 'backWrapper backWrapSty' });
         let buttonText = this.createNode({ el: 'div', cls: 'trackName', elTxt: "Go to previous" });
         let backButton = this.createNode({ el: 'div', cls: 'prevListBtn backBtnStyle material-icons', elTxt: 'arrow_back' });
 
@@ -355,7 +355,6 @@ class Queue {
                 return this.list.default.includes(config.directory + config.singleTrack);
 
             case 'favorite':
-                console.log(config)
                 if (config.isFolder == true) {
                     // ..
                 } else {
@@ -401,7 +400,7 @@ class Queue {
                         // Favorite Default view is not Contains
                         console.log('Favorite Default view is not Contains');
                     } else {
-                       this.el.defaultWrap.appendChild(liAncher);
+                        this.el.defaultWrap.appendChild(liAncher);
                         this.list.favorite.push(config.directory + config.singleTrack);
                         return 'onlyPlayPause';
                     }
@@ -552,13 +551,11 @@ class Queue {
     // remove to queue
     removeToQueue(e) {
         let wrapperMusicNode = this.musicApp.get_target_ancher(e.path, 'a');
-        console.log(wrapperMusicNode);
 
         // remove on DOM
         let rootMusicEl = wrapperMusicNode.parentElement;
         let wrapElement = rootMusicEl.parentElement;
         // remove on queue
-        console.log(wrapElement);
         if (wrapElement.classList.contains('defaultWrap') == true) {
             let indexPos = this.list.default.indexOf(wrapperMusicNode.dataset.tracklist);
             this.list.default.splice(indexPos, 1);
@@ -716,7 +713,6 @@ class Queue {
 
         // check folder or not
         if (config.isFolder == false) {
-            console.log(mainEl)
             let regex = mainEl.dataset.tracklist.match(/(.*\/)(\b[-\w]+.mp3)$/);
             config.directory = regex[1]
             config.singleTrack = regex[2];
@@ -818,6 +814,34 @@ class Queue {
         const rowTrack = playlistWrap.querySelector('.activeList');
         playlistWrap.classList.remove('containActive')
         rowTrack.classList.remove('activeList')
+    }
+
+    toggleFavQueueList(e) {
+        let currentActive = e.target.parentElement;
+        let allEl = currentActive.parentElement.querySelectorAll('.favoriteType')
+
+        for (const el of allEl) {
+            el.querySelector('.mainFavList').style.height = '0px';
+            el.classList.remove('activeFavList');
+        }
+        console.log(currentActive.scrollHeight);
+
+        currentActive.classList.add('activeFavList');
+        currentActive.querySelector('.mainFavList').style.height = `${currentActive.querySelector('.mainFavList').scrollHeight}px`;
+
+        // console.log(currentActive);
+        // console.log(allOther);
+
+        // let currentActive = e.target.parentElement;
+        // let siblingEl = (currentActive.nextElementSibling == null)
+        //     ? currentActive.previousElementSibling
+        //     : currentActive.nextElementSibling
+
+        // currentActive.classList.add('activeFavList');
+        // currentActive.style.height = `${currentActive.style.outerHeight}px`;
+
+        // siblingEl.style.height = '0px';
+        // siblingEl.classList.remove('activeFavList');
     }
 }
 export default Queue;

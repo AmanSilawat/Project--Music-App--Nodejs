@@ -136,12 +136,20 @@ class MusicApp {
             this.queue.toggleInnerPlaylist(e);
         }
 
-        // click on playlist sub list back button
+        // click on favorite sub list back button
         if (
             e.target.classList.contains('backWrapper') == true ||
             e.target.parentElement.classList.contains('backWrapper') == true
         ) {
             this.queue.playlistSubListBack(e);
+        }
+
+        // click on playlist sub list back button
+        if (
+            e.target.classList.contains('favoriteToggleList') == true ||
+            e.target.parentElement.classList.contains('favoriteToggleList') == true
+        ) {
+            this.queue.toggleFavQueueList(e);
         }
     }
 
