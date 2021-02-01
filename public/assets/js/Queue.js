@@ -74,6 +74,35 @@ class Queue {
 
                 this.playlistPopup = new data.default(nodes.popup, nodes.popupHeader, nodes.defaultList, this);
             });
+
+        let accordionChild = this.el.favoriteWrap.querySelector('.accordion').children;
+        console.log(accordionChild.length)
+        switch (accordionChild.length) {
+            case 0: {
+                let defaultView = this.createNode({
+                    el: 'div',
+                    cls: 'defaultView',
+                    elTxt: 'Favorite queue is empty'
+                });
+                this.el.favoriteWrap.prepend(defaultView);
+                break;
+            }
+            case 1: {
+                accordionChild[0].querySelector('.favoriteToggleList').classList.remove('favoriteToggleList');
+                let favoriteWrap = this.el.favoriteWrap.querySelector('.defaultView');
+                if (favoriteWrap != null) {
+                    favoriteWrap.remove();
+                }
+                break;
+            }
+            default: {
+                this.accordion(accordionChild[0]);
+                let favoriteWrap = this.el.favoriteWrap.querySelector('.defaultView');
+                if (favoriteWrap != null) {
+                    favoriteWrap.remove();
+                }
+            }
+        }
     }
 
     popupEventHandler(e) {
@@ -818,30 +847,20 @@ class Queue {
 
     toggleFavQueueList(e) {
         let currentActive = e.target.parentElement;
-        let allEl = currentActive.parentElement.querySelectorAll('.favoriteType')
+        this.accordion(currentActive);
+    }
+
+    accordion(activeEl) {
+        let allEl = activeEl.parentElement.querySelectorAll('.favoriteType')
 
         for (const el of allEl) {
             el.querySelector('.mainFavList').style.height = '0px';
             el.classList.remove('activeFavList');
         }
-        console.log(currentActive.scrollHeight);
+        console.log(activeEl.scrollHeight);
 
-        currentActive.classList.add('activeFavList');
-        currentActive.querySelector('.mainFavList').style.height = `${currentActive.querySelector('.mainFavList').scrollHeight}px`;
-
-        // console.log(currentActive);
-        // console.log(allOther);
-
-        // let currentActive = e.target.parentElement;
-        // let siblingEl = (currentActive.nextElementSibling == null)
-        //     ? currentActive.previousElementSibling
-        //     : currentActive.nextElementSibling
-
-        // currentActive.classList.add('activeFavList');
-        // currentActive.style.height = `${currentActive.style.outerHeight}px`;
-
-        // siblingEl.style.height = '0px';
-        // siblingEl.classList.remove('activeFavList');
+        activeEl.classList.add('activeFavList');
+        activeEl.querySelector('.mainFavList').style.height = `${activeEl.querySelector('.mainFavList').scrollHeight}px`;
     }
 }
 export default Queue;
