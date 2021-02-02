@@ -416,6 +416,7 @@ class Queue {
             }
             // get track node and append
             let liAncher = this.trackHandler(nodesConfig);
+            console.log(config.queueType, liAncher)
 
             // handle type
             switch (config.queueType) {
@@ -429,8 +430,9 @@ class Queue {
                         // Favorite Default view is not Contains
                         console.log('Favorite Default view is not Contains');
                     } else {
-                        this.el.defaultWrap.appendChild(liAncher);
-                        this.list.favorite.push(config.directory + config.singleTrack);
+                        this.el.favoriteWrap.querySelector('.favoriteSongs > .mainFavList').appendChild(liAncher);
+                        this.list.favorite.songs.push(config.directory + config.singleTrack);
+                        liAncher.parentElement.style.height = `${liAncher.parentElement.scrollHeight}px`;
                         return 'onlyPlayPause';
                     }
 

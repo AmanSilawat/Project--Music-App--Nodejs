@@ -916,8 +916,8 @@ a {
 
 .backWrapSty {
     padding: 5px 5px 5px 6px;
-    margin-bottom: 10px;
-    margin-top: -10px;
+    /* margin-bottom: 10px; */
+    margin-top: 0px;
     display: flex;
     align-items: center;
     background: #f4f4f4;
@@ -927,21 +927,24 @@ a {
 .favoriteType {
     position: relative;
     margin-bottom: 20px;
+    overflow: hidden;
 }
 
 .favoriteToggleList + .queueList {
-    height: 0;
+    /* height: 0; */
     overflow: hidden;
     position: relative;
     transition: all .3s;
+    z-index: 9;
+    position: relative;
 }
 
-.favoriteToggleList::after{
-    content: 'add';
-    font-family: 'Material Icons';
-    font-size: 18px;
-    transition: all .3s;
-    color: #909090;
+.favoriteToggleList {
+    display: flex;
+    justify-content: space-between;
+    padding-right: 10px;
+    position: relative;
+    z-index: 10;
 }
 
 .favoriteToggleList {
@@ -957,3 +960,15 @@ a {
 .prevListBtn + .trackName {
     padding-left: 9px;
 }
+
+.activeFavList .favoriteToggleList {
+    background-color: #efd152;
+}
+
+/* .favoriteType  .mainFavList {
+    transform: translateY(-100%);
+}
+
+.activeFavList .mainFavList {
+    transform: translateY(0%);
+} */
