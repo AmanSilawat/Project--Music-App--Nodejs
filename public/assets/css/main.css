@@ -953,6 +953,11 @@ a {
     padding-right: 10px;
 }
 
+.favoriteType .favoriteToggleList::after {
+    content: 'add';
+    font-family: "Material Icons";
+}
+
 .activeFavList .favoriteToggleList::after {
     content: 'remove';
 }

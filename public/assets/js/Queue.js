@@ -72,11 +72,10 @@ class Queue {
 
                 document.body.prepend(nodes.popup);
 
-                this.playlistPopup = new data.default(nodes.popup, nodes.popupHeader, nodes.defaultList, this);
+                this.popupInstance = new data.default(nodes.popup, nodes.popupHeader, nodes.defaultList, this);
             });
 
         let accordionChild = this.el.favoriteWrap.querySelector('.accordion').children;
-        console.log(accordionChild.length)
         switch (accordionChild.length) {
             case 0: {
                 let defaultView = this.createNode({
@@ -117,35 +116,7 @@ class Queue {
             if (inputEl.tagName.toLowerCase() == 'input') {
                 let inputValue = inputEl.value.trim();
                 if (inputValue != '') {
-                    if (!this.queueReference.list.playlist[inputValue]) {
-                        this.queueReference.list.playlist[inputValue] = this.data;
-                        this.hidden();
-                        let loadSomeTime = () => {
-                            let frag = document.createDocumentFragment();
-
-                            let ndConfig = {};
-                            ndConfig.li = {
-                                el: 'li', cls: 'userFavPlaylist', datasetType: 'playlistName', datasetValue: inputValue
-                            };
-                            ndConfig.musicIcon = { el: 'span', cls: 'musicIcon material-icons', elTxt: 'queue_music' };
-                            ndConfig.text = { el: 'span', cls: 'albumName', elTxt: inputValue };
-
-                            let nodes2 = this.queueReference.createQueueEl(ndConfig);
-                            nodes2.li.append(nodes2.musicIcon, nodes2.text);
-                            frag.appendChild(nodes2.li);
-
-                            this.body = frag;
-                            inputEl.value = '';
-                        }
-                        // empty input text & add list
-                        setTimeout(loadSomeTime, 500);
-
-                        // generate playlist
-
-                        this.queueReference.playlistCreator({ inputValue, trackList: this.data });
-                    } else {
-                        alert(`Already Exist: "${inputValue}"`);
-                    }
+                    this.queueReference.handlePopupCreateList({ inputEl, inputValue });
                 } else {
                     inputEl.parentElement.classList.add('shake');
                     inputEl.parentElement.onanimationend = function () {
@@ -166,6 +137,40 @@ class Queue {
                 : e.target.parentElement.querySelector('.albumName');
             this.queueReference.subPlaylistCreator({ appendIn: currentList.textContent, trackList: this.data });
             this.hidden();
+        }
+    }
+
+    handlePopupCreateList({ inputEl, inputValue }) {
+        if (!this.list.playlist[inputValue]) {
+            console.log(this.list.playlist)
+            this.list.playlist[inputValue] = this.popupInstance.data;
+            this.popupInstance.hidden();
+            let loadSomeTime = () => {
+                let frag = document.createDocumentFragment();
+
+                let ndConfig = {};
+                ndConfig.li = {
+                    el: 'li', cls: 'userFavPlaylist', datasetType: 'playlistName', datasetValue: inputValue
+                };
+                ndConfig.musicIcon = { el: 'span', cls: 'musicIcon material-icons', elTxt: 'queue_music' };
+                ndConfig.text = { el: 'span', cls: 'albumName', elTxt: inputValue };
+
+                let nodes2 = this.createQueueEl(ndConfig);
+                nodes2.li.append(nodes2.musicIcon, nodes2.text);
+                frag.appendChild(nodes2.li);
+
+                // this.popupInstance.data = frag;
+                console.log(this.popupInstance)
+                inputEl.value = '';
+            }
+            // empty input text & add list
+            setTimeout(loadSomeTime, 500);
+
+            // generate playlist
+
+            this.playlistCreator({ inputValue, trackList: this.popupInstance.data });
+        } else {
+            alert(`Already Exist: "${inputValue}"`);
         }
     }
 
@@ -402,8 +407,23 @@ class Queue {
     addInQueue(config) {
         // handle folders otherwise tracks
         if (config.isFolder == true) {
-            this.playlistPopup.data = config.tracks;
-            this.playlistPopup.visible();
+            switch (config.queueType) {
+                case 'playlist':
+                    this.popupInstance.headerElement.querySelector('.heading').textContent = "Create Playlist List";
+                    this.popupInstance.data = config.tracks;
+                    this.popupInstance.type = 'playlist';
+                    this.popupInstance.visible();
+                    break;
+                    break;
+
+                case 'favorite':
+                    this.popupInstance.headerElement.querySelector('.heading').textContent = "Create Favorite List";
+                    this.popupInstance.data = config.tracks;
+                    this.popupInstance.type = 'favorite';
+                    this.popupInstance.visible();
+                    break;
+            }
+
         } else {
             // create node config
             const nodesConfig = {
@@ -416,7 +436,6 @@ class Queue {
             }
             // get track node and append
             let liAncher = this.trackHandler(nodesConfig);
-            console.log(config.queueType, liAncher)
 
             // handle type
             switch (config.queueType) {
@@ -598,7 +617,7 @@ class Queue {
             }
         } else if (wrapElement.classList.contains('playlistWrap') == true) {
             delete this.list.playlist[wrapperMusicNode.dataset.playlistGrp];
-            let arr = this.playlistPopup.body.querySelectorAll('[data-playlist-name]');
+            let arr = this.popupInstance.body.querySelectorAll('[data-playlist-name]');
             for (const el of arr) {
                 if (el.dataset.playlistName == wrapperMusicNode.dataset.playlistGrp) {
                     el.remove();
@@ -859,7 +878,6 @@ class Queue {
             el.querySelector('.mainFavList').style.height = '0px';
             el.classList.remove('activeFavList');
         }
-        console.log(activeEl.scrollHeight);
 
         activeEl.classList.add('activeFavList');
         activeEl.querySelector('.mainFavList').style.height = `${activeEl.querySelector('.mainFavList').scrollHeight}px`;
