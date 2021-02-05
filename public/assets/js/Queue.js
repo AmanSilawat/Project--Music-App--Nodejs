@@ -116,7 +116,28 @@ class Queue {
             if (inputEl.tagName.toLowerCase() == 'input') {
                 let inputValue = inputEl.value.trim();
                 if (inputValue != '') {
-                    this.queueReference.handlePopupCreateList({ inputEl, inputValue });
+                    // this.queueReference.handlePopupCreateList({ inputEl, inputValue });
+                    let queue;
+                    switch (this.type) {
+                        case 'playlist':
+                            queue = this.queueReference.list[this.type];
+                            break
+                        
+                        case 'favorite':
+                            queue = this.queueReference.list;
+                            break
+                    }
+                    
+                    console.log(this.type, queue[inputValue])
+                    if (typeof queue[inputValue] == 'undefined') {
+                        queue[inputValue] = this.data;
+                        this.hidden();
+
+                        // generate playlist	
+                        this.queueReference.playlistCreator({ inputValue, trackList: this.data });
+                    } else {
+                        alert(`Already Exist: "${inputValue}"`);
+                    }
                 } else {
                     inputEl.parentElement.classList.add('shake');
                     inputEl.parentElement.onanimationend = function () {
@@ -140,37 +161,35 @@ class Queue {
         }
     }
 
-    handlePopupCreateList({ inputEl, inputValue }) {
-        if (!this.list.playlist[inputValue]) {
-            console.log(this.list.playlist)
-            this.list.playlist[inputValue] = this.popupInstance.data;
-            this.popupInstance.hidden();
-            let loadSomeTime = () => {
-                let frag = document.createDocumentFragment();
-
+    // append queue list node in popup
+    handlePopupCreateList(listObj) {
+        let keys = Object.keys(listObj)
+        if (keys.length != 0) {
+            let frag = document.createDocumentFragment();
+            for (const key of keys) {
+    
                 let ndConfig = {};
                 ndConfig.li = {
-                    el: 'li', cls: 'userFavPlaylist', datasetType: 'playlistName', datasetValue: inputValue
+                    el: 'li', cls: 'userFavPlaylist', datasetType: 'playlistName', datasetValue: key
                 };
                 ndConfig.musicIcon = { el: 'span', cls: 'musicIcon material-icons', elTxt: 'queue_music' };
-                ndConfig.text = { el: 'span', cls: 'albumName', elTxt: inputValue };
-
+                ndConfig.text = { el: 'span', cls: 'albumName', elTxt: key };
+    
                 let nodes2 = this.createQueueEl(ndConfig);
                 nodes2.li.append(nodes2.musicIcon, nodes2.text);
                 frag.appendChild(nodes2.li);
-
-                // this.popupInstance.data = frag;
-                console.log(this.popupInstance)
-                inputEl.value = '';
             }
-            // empty input text & add list
-            setTimeout(loadSomeTime, 500);
-
-            // generate playlist
-
-            this.playlistCreator({ inputValue, trackList: this.popupInstance.data });
+            // remove all child nodes
+            this.removeChildNode(this.popupInstance.body)
+            this.popupInstance.body.append(frag);
         } else {
-            alert(`Already Exist: "${inputValue}"`);
+            this.removeChildNode(this.popupInstance.body)
+        }
+    }
+
+    removeChildNode(parentNode) {
+        while (parentNode.childNodes.length != 0) {
+            parentNode.removeChild(parentNode.firstChild);
         }
     }
 
@@ -412,6 +431,7 @@ class Queue {
                     this.popupInstance.headerElement.querySelector('.heading').textContent = "Create Playlist List";
                     this.popupInstance.data = config.tracks;
                     this.popupInstance.type = 'playlist';
+                    this.handlePopupCreateList(this.list.playlist);
                     this.popupInstance.visible();
                     break;
                     break;
@@ -420,6 +440,7 @@ class Queue {
                     this.popupInstance.headerElement.querySelector('.heading').textContent = "Create Favorite List";
                     this.popupInstance.data = config.tracks;
                     this.popupInstance.type = 'favorite';
+                    this.handlePopupCreateList(this.list.favorite.albums);
                     this.popupInstance.visible();
                     break;
             }
