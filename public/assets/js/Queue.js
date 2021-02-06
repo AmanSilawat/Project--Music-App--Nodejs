@@ -120,21 +120,20 @@ class Queue {
                     let queue;
                     switch (this.type) {
                         case 'playlist':
-                            queue = this.queueReference.list[this.type];
+                            queue = this.queueReference.list.playlist;
                             break
-                        
+
                         case 'favorite':
-                            queue = this.queueReference.list;
+                            queue = this.queueReference.list.favorite.albums;
                             break
                     }
-                    
-                    console.log(this.type, queue[inputValue])
+
                     if (typeof queue[inputValue] == 'undefined') {
                         queue[inputValue] = this.data;
                         this.hidden();
 
                         // generate playlist	
-                        this.queueReference.playlistCreator({ inputValue, trackList: this.data });
+                        this.queueReference.playlistCreator(inputValue);
                     } else {
                         alert(`Already Exist: "${inputValue}"`);
                     }
@@ -152,7 +151,6 @@ class Queue {
             e.target.classList.contains('userFavPlaylist') == true ||
             e.target.parentElement.classList.contains('userFavPlaylist') == true
         ) {
-            console.log('--if--');
             const currentList = e.target.classList.contains('userFavPlaylist')
                 ? e.target.querySelector('.albumName')
                 : e.target.parentElement.querySelector('.albumName');
@@ -167,14 +165,14 @@ class Queue {
         if (keys.length != 0) {
             let frag = document.createDocumentFragment();
             for (const key of keys) {
-    
+
                 let ndConfig = {};
                 ndConfig.li = {
                     el: 'li', cls: 'userFavPlaylist', datasetType: 'playlistName', datasetValue: key
                 };
                 ndConfig.musicIcon = { el: 'span', cls: 'musicIcon material-icons', elTxt: 'queue_music' };
                 ndConfig.text = { el: 'span', cls: 'albumName', elTxt: key };
-    
+
                 let nodes2 = this.createQueueEl(ndConfig);
                 nodes2.li.append(nodes2.musicIcon, nodes2.text);
                 frag.appendChild(nodes2.li);
@@ -194,13 +192,28 @@ class Queue {
     }
 
     subPlaylistCreator({ appendIn, trackList }) {
-        this.el.playlistWrap.querySelector(`[data-playlist-grp="${appendIn}"]`)
-            .nextElementSibling.appendChild(
-                this.popSubListGenerator(appendIn, trackList)
-            );
+        let el;
+        let myQueue;
+        switch (this.popupInstance.type) {
+            case 'playlist':
+                el = this.el.playlistWrap.querySelector(`[data-${this.popupInstance.type}-grp="${appendIn}"]`)
+                myQueue = this.list.playlist[appendIn];
+                break;
+
+            case 'favorite':
+                el = this.el.favoriteWrap.querySelector(`.favoriteAlbums > .mainFavList [data-${this.popupInstance.type}-grp="${appendIn}"]`)
+                myQueue = this.list.favorite.albums[appendIn];
+                break;
+        }
+        
+        console.log(this.popupInstance.type, appendIn);
+        console.log(el)
+        el.nextElementSibling.appendChild(
+            this.popSubListGenerator(appendIn, trackList)
+        );
 
         // added in playlist queue
-        this.list.playlist[appendIn].push(...trackList);
+        myQueue.push(...trackList);
     }
 
     async fetchPopup(url) {
@@ -211,12 +224,22 @@ class Queue {
         // ..
     }
 
-    playlistCreator({ inputValue, trackList }) {
+    playlistCreator(inputValue) {
+        let dataSet;
+        switch (this.popupInstance.type) {
+            case 'playlist':
+                dataSet = 'playlistGrp'
+                break;
+
+            case 'favorite':
+                dataSet = 'favoriteGrp'
+                break;
+        }
         let folderConfig = {
             elTxt: inputValue,
             imgSrc: 'assets/images/no-image-available.jpg',
             dataset: {
-                datasetType: 'playlistGrp',
+                datasetType: dataSet,
                 datasetValue: inputValue
             }
         }
@@ -234,17 +257,35 @@ class Queue {
         ul.appendChild(this.popSubListGenerator(inputValue));
 
         parentNode.appendChild(ul)
-        this.el.playlistWrap.appendChild(parentNode);
 
-        let defaultViewNode = this.el.playlistWrap.querySelector('.defaultView');
-        if (defaultViewNode != null) {
-            defaultViewNode.remove();
+        switch (this.popupInstance.type) {
+            case 'playlist':
+                this.el.playlistWrap.appendChild(parentNode);
+
+                let defaultViewNode = this.el.playlistWrap.querySelector('.defaultView');
+                if (defaultViewNode != null) {
+                    defaultViewNode.remove();
+                }
+                break;
+
+            case 'favorite':
+                this.el.favoriteWrap.querySelector('.favoriteAlbums > .mainFavList').appendChild(parentNode);
+                break;
         }
     }
 
     popSubListGenerator(currentListName, trackList = undefined) {
         let fragment = document.createDocumentFragment();
-        const currentTrackList = trackList || this.list.playlist[currentListName]
+        let currentTrackList;
+        switch (this.popupInstance.type) {
+            case 'playlist':
+                currentTrackList = trackList || this.list.playlist[currentListName];
+                break;
+
+            case 'favorite':
+                currentTrackList = trackList || this.list.favorite.albums[currentListName];
+                break;
+        }
         for (const track of currentTrackList) {
             // create node config
             const nodesConfig = {
@@ -741,6 +782,12 @@ class Queue {
                     this.el.playlistWrap.classList.remove('containActive');
                     this.el.playlistWrap.querySelector('.activeList').classList.remove('activeList')
                 }
+
+                let queueToggle = this.el.favoriteWrap.querySelector('.queueToggle');
+                if (queueToggle.classList.contains('containActive') == true) {
+                    queueToggle.classList.remove('containActive');
+                    queueToggle.querySelector('.activeList').classList.remove('activeList')
+                }
                 break;
 
             case 'playlist':
@@ -751,6 +798,11 @@ class Queue {
                 if (this.el.playlistWrap.classList.contains('containActive') == true) {
                     this.el.playlistWrap.classList.remove('containActive');
                     this.el.playlistWrap.querySelector('.activeList').classList.remove('activeList')
+                }
+
+                if (this.el.favoriteWrap.classList.contains('containActive') == true) {
+                    this.el.favoriteWrap.classList.remove('containActive');
+                    this.el.favoriteWrap.querySelector('.activeList').classList.remove('activeList')
                 }
                 break;
 
@@ -881,9 +933,10 @@ class Queue {
     }
 
     playlistSubListBack(e) {
-        const playlistWrap = document.querySelector('.playlistWrap');
-        const rowTrack = playlistWrap.querySelector('.activeList');
-        playlistWrap.classList.remove('containActive')
+        let queueToggle = this.musicApp.get_target_ancher(e.path, '.queueToggle')
+        const rowTrack = queueToggle.querySelector('.activeList');
+        console.log(rowTrack)
+        queueToggle.classList.remove('containActive')
         rowTrack.classList.remove('activeList')
     }
 

@@ -134,7 +134,10 @@ class MusicApp {
         }
 
         // add to playlist queue
-        if (e.target.hasAttribute('data-playlist-grp') == true) {
+        if (
+            e.target.hasAttribute('data-playlist-grp') == true ||
+            e.target.hasAttribute('data-favorite-grp') == true
+        ) {
             this.queue.toggleInnerPlaylist(e);
         }
 
@@ -143,6 +146,7 @@ class MusicApp {
             e.target.classList.contains('backWrapper') == true ||
             e.target.parentElement.classList.contains('backWrapper') == true
         ) {
+            console.log(e.target)
             this.queue.playlistSubListBack(e);
         }
 

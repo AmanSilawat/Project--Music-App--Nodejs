@@ -764,11 +764,11 @@ a {
 }
 
 
-.playlistWrap > li {
+/* .playlistWrap > li {
     position: unset;
     left: 0%;
     transition: all .3s cubic-bezier(0.075, 0.82, 0.165, 1);
-}
+} */
 
 /* popup  */
 .popup .inputField {
@@ -883,11 +883,11 @@ a {
 
 
 
-.queueList.containActive {
+/* .queueList.containActive {
     left: -100%;
-}
+} */
 
-.playlistWrap.containActive > li {
+/* .playlistWrap.containActive > li {
     left: 0px;
 }
 
@@ -899,7 +899,7 @@ a {
 
 .playlistWrap > li.activeList > ul {
     left: 100%;
-}
+} */
 
 .backWrapSty .backBtnStyle {
     position: unset;
@@ -931,12 +931,9 @@ a {
 }
 
 .favoriteToggleList + .queueList {
-    /* height: 0; */
-    overflow: hidden;
     position: relative;
     transition: all .3s;
     z-index: 9;
-    position: relative;
 }
 
 .favoriteToggleList {
@@ -977,3 +974,31 @@ a {
 .activeFavList .mainFavList {
     transform: translateY(0%);
 } */
+
+.queueToggle {
+    left: 0%;
+    transition: all .3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.queueToggle > li > ul {
+    position: absolute !important;
+    left: 1000px;
+    top: 0;
+    transition: all .3s;
+}
+
+.queueToggle.containActive {
+    left: -100%;
+}
+
+.queueToggle.containActive > li {
+    left: 0px;
+}
+
+.queueToggle > li.activeList > ul {
+    left: 100%;
+}
+
+.queueToggle.containActive {
+    left: -100%;
+}
