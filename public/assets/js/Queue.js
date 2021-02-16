@@ -75,32 +75,46 @@ class Queue {
                 this.popupInstance = new data.default(nodes.popup, nodes.popupHeader, nodes.defaultList, this);
             });
 
-        let accordionChild = this.el.favoriteWrap.querySelector('.accordion').children;
-        switch (accordionChild.length) {
-            case 0: {
-                let defaultView = this.createNode({
-                    el: 'div',
-                    cls: 'defaultView',
-                    elTxt: 'Favorite queue is empty'
-                });
-                this.el.favoriteWrap.prepend(defaultView);
-                break;
+        this.accordionVisibility()
+    }
+
+    accordionVisibility() {
+        function RemoveDefaultView(el) {
+            let defaultView = el.querySelector('.defaultView');
+            if (defaultView != null) {
+                defaultView.remove();
             }
-            case 1: {
-                accordionChild[0].querySelector('.favoriteToggleList').classList.remove('favoriteToggleList');
-                let favoriteWrap = this.el.favoriteWrap.querySelector('.defaultView');
-                if (favoriteWrap != null) {
-                    favoriteWrap.remove();
-                }
-                break;
-            }
-            default: {
-                this.accordion(accordionChild[0]);
-                let favoriteWrap = this.el.favoriteWrap.querySelector('.defaultView');
-                if (favoriteWrap != null) {
-                    favoriteWrap.remove();
-                }
-            }
+        }
+
+        let accordionChild = this.el.favoriteWrap.querySelector('.accordion');
+        let favoriteSongs = accordionChild.querySelector('.favoriteSongs');
+        let favoriteSongsLen = favoriteSongs.querySelector('.mainFavList').childElementCount;
+
+        let favoriteAlbums = accordionChild.querySelector('.favoriteAlbums');
+        let favoriteAlbumsLen = favoriteAlbums.querySelector('.mainFavList').childElementCount;
+
+        if (favoriteSongsLen == 0 && favoriteAlbumsLen == 0) {
+            let defaultView = this.createNode({
+                el: 'div',
+                cls: 'defaultView',
+                elTxt: 'Favorite queue is empty'
+            });
+            this.el.favoriteWrap.prepend(defaultView);
+            favoriteSongs.classList.add('hideEl');
+            favoriteAlbums.classList.add('hideEl');
+
+        } else if (favoriteSongsLen != 0 && favoriteAlbumsLen != 0) {
+            favoriteSongs.classList.remove('hideEl');
+            favoriteAlbums.classList.remove('hideEl');
+            RemoveDefaultView(this.el.favoriteWrap);
+        } else if (favoriteSongsLen != 0) {
+            favoriteSongs.classList.remove('hideEl');
+            favoriteAlbums.classList.add('hideEl');
+            RemoveDefaultView(this.el.favoriteWrap);
+        } else if (favoriteAlbumsLen != 0) {
+            favoriteSongs.classList.add('hideEl');
+            favoriteAlbums.classList.remove('hideEl');
+            RemoveDefaultView(this.el.favoriteWrap);
         }
     }
 
@@ -114,7 +128,7 @@ class Queue {
         if (e.target.classList.contains('createNew') == true) {
             let inputEl = e.target.previousElementSibling;
             if (inputEl.tagName.toLowerCase() == 'input') {
-                let inputValue = inputEl.value.trim();
+                let inputValue = inputEl.value.trim().toLowerCase().replace(/ /g, '_');
                 if (inputValue != '') {
                     // this.queueReference.handlePopupCreateList({ inputEl, inputValue });
                     let queue;
@@ -129,7 +143,7 @@ class Queue {
                     }
 
                     if (typeof queue[inputValue] == 'undefined') {
-                        queue[inputValue] = this.data;
+                        queue[inputValue.toLowerCase().replace(/ /g, '_')] = this.data;
                         this.hidden();
 
                         // generate playlist	
@@ -205,11 +219,11 @@ class Queue {
                 myQueue = this.list.favorite.albums[appendIn];
                 break;
         }
-        
+
         console.log(this.popupInstance.type, appendIn);
         console.log(el)
         el.nextElementSibling.appendChild(
-            this.popSubListGenerator(appendIn, trackList)
+            this.popSubListGenerator({ inputValue: appendIn, trackList })
         );
 
         // added in playlist queue
@@ -225,21 +239,42 @@ class Queue {
     }
 
     playlistCreator(inputValue) {
-        let dataSet;
+        let dataSetType;
         switch (this.popupInstance.type) {
             case 'playlist':
-                dataSet = 'playlistGrp'
+                dataSetType = 'playlistGrp'
                 break;
 
             case 'favorite':
-                dataSet = 'favoriteGrp'
+                dataSetType = 'favoriteGrp'
                 break;
         }
+
+        let nodeWrapper = this.trackNodeWithBackBtn_grp({ inputValue, dataSetType })
+
+
+        switch (this.popupInstance.type) {
+            case 'playlist':
+                this.el.playlistWrap.appendChild(nodeWrapper);
+
+                let defaultViewNode = this.el.playlistWrap.querySelector('.defaultView');
+                if (defaultViewNode != null) {
+                    defaultViewNode.remove();
+                }
+                break;
+
+            case 'favorite':
+                this.el.favoriteWrap.querySelector('.favoriteAlbums > .mainFavList').appendChild(nodeWrapper);
+                break;
+        }
+    }
+
+    trackNodeWithBackBtn_grp({ inputValue, dataSetType }) {
         let folderConfig = {
-            elTxt: inputValue,
+            elTxt: inputValue.replace(/_/g, ' '),
             imgSrc: 'assets/images/no-image-available.jpg',
             dataset: {
-                datasetType: dataSet,
+                datasetType: dataSetType,
                 datasetValue: inputValue
             }
         }
@@ -254,36 +289,22 @@ class Queue {
         ul.appendChild(backButtonWrapper);
 
         // create multiple track list
-        ul.appendChild(this.popSubListGenerator(inputValue));
+        ul.appendChild(this.popSubListGenerator({ inputValue, dataSetType }));
 
-        parentNode.appendChild(ul)
-
-        switch (this.popupInstance.type) {
-            case 'playlist':
-                this.el.playlistWrap.appendChild(parentNode);
-
-                let defaultViewNode = this.el.playlistWrap.querySelector('.defaultView');
-                if (defaultViewNode != null) {
-                    defaultViewNode.remove();
-                }
-                break;
-
-            case 'favorite':
-                this.el.favoriteWrap.querySelector('.favoriteAlbums > .mainFavList').appendChild(parentNode);
-                break;
-        }
+        parentNode.append(ul);
+        return parentNode;
     }
 
-    popSubListGenerator(currentListName, trackList = undefined) {
+    popSubListGenerator({ inputValue, trackList = undefined, dataSetType = undefined }) {
         let fragment = document.createDocumentFragment();
         let currentTrackList;
-        switch (this.popupInstance.type) {
-            case 'playlist':
-                currentTrackList = trackList || this.list.playlist[currentListName];
+        switch (dataSetType) {
+            case 'playlistGrp':
+                currentTrackList = trackList || this.list.playlist[inputValue];
                 break;
 
-            case 'favorite':
-                currentTrackList = trackList || this.list.favorite.albums[currentListName];
+            case 'favoriteGrp':
+                currentTrackList = trackList || this.list.favorite.albums[inputValue];
                 break;
         }
         for (const track of currentTrackList) {
@@ -452,7 +473,19 @@ class Queue {
                 if (config.isFolder == true) {
                     // ..
                 } else {
-                    return this.list.favorite.songs.includes(config.directory + config.singleTrack);
+                    let result = this.list.favorite.songs.includes(config.directory + config.singleTrack)
+                    let heartEl = config.mainEle.querySelector('.myFav');
+                    if (result == true && heartEl.classList.contains('addFav') == true) {
+                        heartEl.classList.remove('addFav');
+                        let dataset = config.mainEle.dataset.tracklist;
+                        console.log(dataset, this.list.favorite.songs)
+                        let index = this.list.favorite.songs.indexOf(dataset);
+                        this.list.favorite.songs.splice(index, 1);
+                        let favElement = this.el.favoriteWrap.querySelector(`[data-tracklist="${dataset}"]`)
+                        favElement.parentElement.remove();
+                        this.accordionVisibility()
+                    }
+                    return result;
                 }
 
             case 'playlist':
@@ -478,11 +511,26 @@ class Queue {
                     break;
 
                 case 'favorite':
-                    this.popupInstance.headerElement.querySelector('.heading').textContent = "Create Favorite List";
-                    this.popupInstance.data = config.tracks;
-                    this.popupInstance.type = 'favorite';
-                    this.handlePopupCreateList(this.list.favorite.albums);
-                    this.popupInstance.visible();
+                    let inputValue = config.directory.match(/\/(.*)$/)[1].replace(/-/g, '_');
+                    if (inputValue in this.list.favorite.albums) {
+                        let heartEl = config.mainEle.querySelector('.myFav');
+                        if (heartEl.classList.contains('addFav') == true) {
+                            heartEl.classList.remove('addFav');
+                            delete this.list.favorite.albums[inputValue]
+                            let favElement = this.el.favoriteWrap.querySelector(`[data-favorite-grp="${inputValue}"]`)
+                            favElement.parentElement.remove();
+                            this.accordionVisibility()
+                        }
+                    } else {
+                        this.list.favorite.albums[inputValue] = config.tracks;
+                        let nodeWrapper = this.trackNodeWithBackBtn_grp({ inputValue, dataSetType: 'favoriteGrp' })
+                        this.el.favoriteWrap.querySelector('.favoriteAlbums > .mainFavList').appendChild(nodeWrapper);
+                        this.accordionVisibility()
+
+                        config.mainEle.querySelector('.myFav').classList.add('addFav');
+                    }
+                    // this.popupInstance.data = config.tracks;
+                    // this.popupInstance.type = 'favorite';
                     break;
             }
 
@@ -507,15 +555,12 @@ class Queue {
                     return 'chnageMusic';
 
                 case 'favorite':
-                    if (this.el.favoriteWrap.children[0].classList.contains('defaultView') == true) {
-                        // Favorite Default view is not Contains
-                        console.log('Favorite Default view is not Contains');
-                    } else {
-                        this.el.favoriteWrap.querySelector('.favoriteSongs > .mainFavList').appendChild(liAncher);
-                        this.list.favorite.songs.push(config.directory + config.singleTrack);
-                        liAncher.parentElement.style.height = `${liAncher.parentElement.scrollHeight}px`;
-                        return 'onlyPlayPause';
-                    }
+                    this.el.favoriteWrap.querySelector('.favoriteSongs > .mainFavList').appendChild(liAncher);
+                    this.list.favorite.songs.push(config.directory + config.singleTrack);
+                    liAncher.parentElement.style.height = `${liAncher.parentElement.scrollHeight}px`;
+                    this.accordionVisibility()
+                    config.mainEle.querySelector('.myFav').classList.add('addFav');
+                    return 'onlyPlayPause';
 
                 default:
                     return;

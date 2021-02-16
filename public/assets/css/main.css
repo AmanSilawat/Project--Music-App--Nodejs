@@ -533,6 +533,10 @@ a {
 }
 
 .myFav::after {
+    content: 'favorite_border';
+}
+
+.myFav.addFav::after {
     content: 'favorite';
 }
 .favPlaylist::after {
@@ -1001,4 +1005,8 @@ a {
 
 .queueToggle.containActive {
     left: -100%;
+}
+
+.hideEl {
+    display: none;
 }
