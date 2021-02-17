@@ -149,7 +149,7 @@ class Queue {
                         // generate playlist	
                         this.queueReference.playlistCreator(inputValue);
                     } else {
-                        alert(`Already Exist: "${inputValue}"`);
+                        alert(`Already Exist: "${inputValue.replace(/_/g, ' ')}"`);
                     }
                 } else {
                     inputEl.parentElement.classList.add('shake');
@@ -185,7 +185,7 @@ class Queue {
                     el: 'li', cls: 'userFavPlaylist', datasetType: 'playlistName', datasetValue: key
                 };
                 ndConfig.musicIcon = { el: 'span', cls: 'musicIcon material-icons', elTxt: 'queue_music' };
-                ndConfig.text = { el: 'span', cls: 'albumName', elTxt: key };
+                ndConfig.text = { el: 'span', cls: 'albumName', elTxt: key.replace(/_/g, ' ') };
 
                 let nodes2 = this.createQueueEl(ndConfig);
                 nodes2.li.append(nodes2.musicIcon, nodes2.text);
@@ -280,8 +280,8 @@ class Queue {
         }
         let parentNode = this.folderHandler(folderConfig);
         let ul = this.createNode({ el: 'ul', cls: 'queueList' });
-        let backButtonWrapper = this.createNode({ el: 'div', cls: 'backWrapper backWrapSty' });
-        let buttonText = this.createNode({ el: 'div', cls: 'trackName', elTxt: "Go to previous" });
+        let backButtonWrapper = this.createNode({ el: 'div', cls: 'backWrapper backWrapSty', title: 'Go back' });
+        let buttonText = this.createNode({ el: 'div', cls: 'trackName', elTxt: inputValue.replace(/_/g, ' ') });
         let backButton = this.createNode({ el: 'div', cls: 'prevListBtn backBtnStyle material-icons', elTxt: 'arrow_back' });
 
         // add back button in child track list
@@ -557,7 +557,7 @@ class Queue {
                 case 'favorite':
                     this.el.favoriteWrap.querySelector('.favoriteSongs > .mainFavList').appendChild(liAncher);
                     this.list.favorite.songs.push(config.directory + config.singleTrack);
-                    liAncher.parentElement.style.height = `${liAncher.parentElement.scrollHeight}px`;
+                    // liAncher.parentElement.style.height = `${liAncher.parentElement.scrollHeight}px`;
                     this.accordionVisibility()
                     config.mainEle.querySelector('.myFav').classList.add('addFav');
                     return 'onlyPlayPause';
@@ -653,7 +653,8 @@ class Queue {
         datasetValue = null,
         innerHtml = null,
         id = null,
-        placeTxt = null
+        placeTxt = null,
+        title = null
     }) {
         const node = document.createElement(el)
 
@@ -700,6 +701,11 @@ class Queue {
         // add placeholder text
         if (placeTxt != null) {
             node.placeholder = placeTxt;
+        }
+
+        // set Tooltip
+        if (title != null) {
+            node.title = title;
         }
 
         return node;
@@ -991,15 +997,18 @@ class Queue {
     }
 
     accordion(activeEl) {
-        let allEl = activeEl.parentElement.querySelectorAll('.favoriteType')
+        activeEl.classList.toggle('activeFavList')
 
-        for (const el of allEl) {
-            el.querySelector('.mainFavList').style.height = '0px';
-            el.classList.remove('activeFavList');
-        }
+        // ! accordion pattern
+        // let allEl = activeEl.parentElement.querySelectorAll('.favoriteType')
 
-        activeEl.classList.add('activeFavList');
-        activeEl.querySelector('.mainFavList').style.height = `${activeEl.querySelector('.mainFavList').scrollHeight}px`;
+        // for (const el of allEl) {
+        //     el.querySelector('.mainFavList').style.height = '0px';
+        //     el.classList.remove('activeFavList');
+        // }
+
+        // activeEl.classList.add('activeFavList');
+        // activeEl.querySelector('.mainFavList').style.height = `${activeEl.querySelector('.mainFavList').scrollHeight}px`;
     }
 }
 export default Queue;

@@ -926,12 +926,13 @@ a {
     align-items: center;
     background: #f4f4f4;
     cursor: pointer;
+    box-shadow: inset 0px -7px 10px 0px rgb(0 0 0 / 7%)
 }
 
 .favoriteType {
     position: relative;
     margin-bottom: 20px;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .favoriteToggleList + .queueList {
@@ -965,10 +966,15 @@ a {
 
 .prevListBtn + .trackName {
     padding-left: 9px;
+    text-transform: capitalize;
 }
 
 .activeFavList .favoriteToggleList {
     background-color: #efd152;
+}
+
+.activeFavList .mainFavList {
+    display: none;
 }
 
 /* .favoriteType  .mainFavList {
