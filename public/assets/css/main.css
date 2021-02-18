@@ -956,12 +956,12 @@ a {
 }
 
 .favoriteType .favoriteToggleList::after {
-    content: 'add';
+    content: 'remove';
     font-family: "Material Icons";
 }
 
 .activeFavList .favoriteToggleList::after {
-    content: 'remove';
+    content: 'add';
 }
 
 .prevListBtn + .trackName {

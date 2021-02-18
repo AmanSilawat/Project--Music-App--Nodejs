@@ -223,7 +223,7 @@ class Queue {
         console.log(this.popupInstance.type, appendIn);
         console.log(el)
         el.nextElementSibling.appendChild(
-            this.popSubListGenerator({ inputValue: appendIn, trackList })
+            this.popSubListGenerator({ inputValue: appendIn, trackList, dataSetType: 'playlistGrp' })
         );
 
         // added in playlist queue
@@ -508,7 +508,6 @@ class Queue {
                     this.handlePopupCreateList(this.list.playlist);
                     this.popupInstance.visible();
                     break;
-                    break;
 
                 case 'favorite':
                     let inputValue = config.directory.match(/\/(.*)$/)[1].replace(/-/g, '_');
@@ -529,8 +528,9 @@ class Queue {
 
                         config.mainEle.querySelector('.myFav').classList.add('addFav');
                     }
-                    // this.popupInstance.data = config.tracks;
-                    // this.popupInstance.type = 'favorite';
+                    break;
+
+                case 'default':
                     break;
             }
 

@@ -100,7 +100,9 @@ class MusicApp {
 
         // add to queue
         if (e.target.classList.contains('addToQueue') == true) {
-            const config = { queueType: "favorite", isFolder: false }
+            let anchor = this.get_target_ancher(e.path, 'a');
+            let isFolder = anchor.dataset.tracklist == undefined ? true : false
+            const config = { queueType: "favorite", isFolder }
             this.queue.setConfigQueue(e, config);
         }
 
