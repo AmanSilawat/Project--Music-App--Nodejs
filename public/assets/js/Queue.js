@@ -1,17 +1,17 @@
 class Queue {
     constructor(musicAppInstance) {
         this.musicApp = musicAppInstance;
-        this.popup = null,
-            this.el = {
-                playingElBody: null,
-                playingElDefaultQueue: null,
-                playingElFavoriteQueue: null,
-                playlistActive: null,
-                root: document.querySelector('.queuePanel'),
-                defaultWrap: document.querySelector('.queueList'),
-                favoriteWrap: document.querySelector('.favoriteWrap'),
-                playlistWrap: document.querySelector('.playlistWrap')
-            };
+        this.popup = null;
+        this.el = {
+            playingElBody: null,
+            playingElDefaultQueue: null,
+            playingElFavoriteQueue: null,
+            playlistActive: null,
+            root: document.querySelector('.queuePanel'),
+            defaultWrap: document.querySelector('.defaultWrap'),
+            favoriteWrap: document.querySelector('.favoriteWrap'),
+            playlistWrap: document.querySelector('.playlistWrap')
+        };
         this.visibity = false;
         this.playInfo = {
             currQueue: null,
@@ -531,27 +531,18 @@ class Queue {
                     break;
 
                 case 'default':
+                    this.defaultQueueHandler(config);
                     break;
             }
 
         } else {
-            // create node config
-            const nodesConfig = {
-                textContent: config.mainEle.querySelector('.gridHead').textContent,
-                imgSrc: config.mainEle.querySelector('.blobImg').src,
-                dataset: {
-                    datasetType: 'tracklist',
-                    datasetValue: config.directory + config.singleTrack
-                }
-            }
-            // get track node and append
-            let liAncher = this.trackHandler(nodesConfig);
+            // create track node elements
+            const liAncher = this.trackConfigAndNodes({ config })
 
             // handle type
             switch (config.queueType) {
                 case 'default':
-                    this.el.defaultWrap.appendChild(liAncher);
-                    this.list.default.push(config.directory + config.singleTrack);
+                    this.defaultQueueHandler(config)
                     return 'chnageMusic';
 
                 case 'favorite':
@@ -567,6 +558,56 @@ class Queue {
             }
 
         }
+    }
+
+    trackConfigAndNodes({ config, additionalConfig = undefined }) {
+        if (typeof additionalConfig == 'undefined') {
+            additionalConfig = {
+                datasetValue: config.directory + config.singleTrack,
+                textContent: config.mainEle.querySelector('.gridHead').textContent
+            }
+        }
+        // create node config
+        const nodesConfig = this.trackConfig(config, additionalConfig);
+
+        // get track node and append
+        return this.trackHandler(nodesConfig);
+    }
+
+    trackConfig(config, additionalConfig) {
+        return {
+            textContent: additionalConfig.textContent,
+            imgSrc: config.mainEle.querySelector('.blobImg').src,
+            dataset: {
+                datasetType: 'tracklist',
+                datasetValue: additionalConfig.datasetValue
+            }
+        }
+    }
+
+    defaultQueueHandler(config) {
+        let liAncher = document.createDocumentFragment();
+        console.log(config)
+
+        switch (config.isFolder) {
+            case false:
+                liAncher.appendChild(this.trackConfigAndNodes({ config }));
+                break;
+
+            case true:
+                for (const track of config.tracks) {
+                    let additionalConfig = {
+                        datasetValue: track,
+                        textContent: track.match(/([-\w]+)\.mp3$/)[1].replace(/-/g, ' ')
+
+                    }
+                    liAncher.appendChild(this.trackConfigAndNodes({ config, additionalConfig }));
+                }
+                break;
+        }
+
+        this.el.defaultWrap.appendChild(liAncher);
+        this.list.default.push(config.directory + config.singleTrack);
     }
 
     // Handle playlist 
