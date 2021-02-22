@@ -93,6 +93,7 @@ class Queue {
         let favoriteAlbums = accordionChild.querySelector('.favoriteAlbums');
         let favoriteAlbumsLen = favoriteAlbums.querySelector('.mainFavList').childElementCount;
 
+        console.log(favoriteSongsLen, favoriteAlbumsLen)
         if (favoriteSongsLen == 0 && favoriteAlbumsLen == 0) {
             let defaultView = this.createNode({
                 el: 'div',
@@ -220,8 +221,6 @@ class Queue {
                 break;
         }
 
-        console.log(this.popupInstance.type, appendIn);
-        console.log(el)
         el.nextElementSibling.appendChild(
             this.popSubListGenerator({ inputValue: appendIn, trackList, dataSetType: 'playlistGrp' })
         );
@@ -474,16 +473,8 @@ class Queue {
                     // ..
                 } else {
                     let result = this.list.favorite.songs.includes(config.directory + config.singleTrack)
-                    let heartEl = config.mainEle.querySelector('.myFav');
-                    if (result == true && heartEl.classList.contains('addFav') == true) {
-                        heartEl.classList.remove('addFav');
-                        let dataset = config.mainEle.dataset.tracklist;
-                        console.log(dataset, this.list.favorite.songs)
-                        let index = this.list.favorite.songs.indexOf(dataset);
-                        this.list.favorite.songs.splice(index, 1);
-                        let favElement = this.el.favoriteWrap.querySelector(`[data-tracklist="${dataset}"]`)
-                        favElement.parentElement.remove();
-                        this.accordionVisibility()
+                    if (result == true) {
+                        this.removeHeart(config.mainEle);
                     }
                     return result;
                 }
@@ -493,6 +484,21 @@ class Queue {
 
             default:
                 return false;
+        }
+    }
+
+    removeHeart(mainEle) {
+        let heartEl = mainEle.querySelector('.myFav');
+        console.log(heartEl);
+        if (heartEl.classList.contains('addFav') == true) {
+            console.log('---------------')
+            heartEl.classList.remove('addFav');
+            let dataset = mainEle.dataset.tracklist;
+            let index = this.list.favorite.songs.indexOf(dataset);
+            this.list.favorite.songs.splice(index, 1);
+            let favElement = this.el.favoriteWrap.querySelector(`[data-tracklist="${dataset}"]`)
+            favElement.parentElement.remove();
+            this.accordionVisibility()
         }
     }
 
@@ -587,7 +593,6 @@ class Queue {
 
     defaultQueueHandler(config) {
         let liAncher = document.createDocumentFragment();
-        console.log(config)
 
         switch (config.isFolder) {
             case false:
@@ -755,28 +760,40 @@ class Queue {
     // remove to queue
     removeToQueue(e) {
         let wrapperMusicNode = this.musicApp.get_target_ancher(e.path, 'a');
+        let queueTypeNode = this.musicApp.get_target_ancher(e.path, '.uniqeKey');
 
         // remove on DOM
         let rootMusicEl = wrapperMusicNode.parentElement;
-        let wrapElement = rootMusicEl.parentElement;
+        console.log(e.path, queueTypeNode)
         // remove on queue
-        if (wrapElement.classList.contains('defaultWrap') == true) {
+        if (queueTypeNode.classList.contains('defaultWrap') == true) {
+            console.log('defaultWrap')
             let indexPos = this.list.default.indexOf(wrapperMusicNode.dataset.tracklist);
             this.list.default.splice(indexPos, 1);
-        } else if (wrapElement.classList.contains('favoriteWrap') == true) {
-            let indexPos = this.list.favorite.indexOf(wrapperMusicNode.dataset.tracklist);
-            this.list.favorite.splice(indexPos, 1);
-            if (this.list.default.length == 0) {
-                wrapElement.appendChild(this.addDefaultQueueListNode("Favorite"));
+        } else if (queueTypeNode.classList.contains('favoriteWrap') == true) {
+            console.log('favoriteWrap')
+
+            let favoriteTypeNode = this.musicApp.get_target_ancher(e.path, '.favoriteType');
+            
+            if (favoriteTypeNode.classList.contains('favoriteSongs') == true) {
+                // let indexPos = this.list.favorite.songs.indexOf(wrapperMusicNode.dataset.tracklist);
+                // this.list.favorite.songs.splice(indexPos, 1);
+                let node = this.musicApp.el.container.querySelector('a[data-tracklist="singer/owais-raza-qadri/nabi-ka-jashn-aya.mp3"]')
+                console.log(node)
+                this.removeHeart(node);
+                console.log(this.list);
+
             }
-        } else if (wrapElement.classList.contains('playlistWrap') == true) {
+
+        } else if (queueTypeNode.classList.contains('playlistWrap') == true) {
+            console.log('playlistWrap')
             delete this.list.playlist[wrapperMusicNode.dataset.playlistGrp];
             let arr = this.popupInstance.body.querySelectorAll('[data-playlist-name]');
             for (const el of arr) {
                 if (el.dataset.playlistName == wrapperMusicNode.dataset.playlistGrp) {
                     el.remove();
                     if (Object.keys(this.list.playlist).length == 0) {
-                        wrapElement.appendChild(this.addDefaultQueueListNode("Playlist"));
+                        queueTypeNode.appendChild(this.addDefaultQueueListNode("Playlist"));
                     }
                     break;
                 }
@@ -1027,7 +1044,6 @@ class Queue {
     playlistSubListBack(e) {
         let queueToggle = this.musicApp.get_target_ancher(e.path, '.queueToggle')
         const rowTrack = queueToggle.querySelector('.activeList');
-        console.log(rowTrack)
         queueToggle.classList.remove('containActive')
         rowTrack.classList.remove('activeList')
     }
