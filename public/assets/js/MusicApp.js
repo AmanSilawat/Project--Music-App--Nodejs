@@ -108,7 +108,9 @@ class MusicApp {
 
         // remove to queue
         if (e.target.classList.contains('removeBtn') == true) {
+            // debugger;
             this.queue.removeToQueue(e);
+            return;
         }
 
         // show to favorite queue
@@ -148,7 +150,6 @@ class MusicApp {
             e.target.classList.contains('backWrapper') == true ||
             e.target.parentElement.classList.contains('backWrapper') == true
         ) {
-            console.log(e.target)
             this.queue.playlistSubListBack(e);
         }
 
@@ -410,11 +411,8 @@ class MusicApp {
         // check what's queue currently running
         if (currQueue != null) {
             const currIndex = this.queue.info.currIndex;
-            console.log(this.queue[currQueue], currIndex);
-            console.log(this.queue[currQueue][currIndex]);
             if (typeof this.queue[currQueue][currIndex] != undefined) {
                 const nextSong = this.queue[currQueue][currIndex + 1];
-                console.log(nextSong)
                 this.audio.src = `./assets/data/${nextSong}`;
                 this.audio.load();
                 this.musicStateChange();

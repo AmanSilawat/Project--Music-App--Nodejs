@@ -93,7 +93,6 @@ class Queue {
         let favoriteAlbums = accordionChild.querySelector('.favoriteAlbums');
         let favoriteAlbumsLen = favoriteAlbums.querySelector('.mainFavList').childElementCount;
 
-        console.log(favoriteSongsLen, favoriteAlbumsLen)
         if (favoriteSongsLen == 0 && favoriteAlbumsLen == 0) {
             let defaultView = this.createNode({
                 el: 'div',
@@ -268,13 +267,13 @@ class Queue {
         }
     }
 
-    trackNodeWithBackBtn_grp({ inputValue, dataSetType }) {
+    trackNodeWithBackBtn_grp({ inputValue, dataSetType, datasetValue = undefined }) {
         let folderConfig = {
             elTxt: inputValue.replace(/_/g, ' '),
             imgSrc: 'assets/images/no-image-available.jpg',
             dataset: {
                 datasetType: dataSetType,
-                datasetValue: inputValue
+                datasetValue: datasetValue || inputValue
             }
         }
         let parentNode = this.folderHandler(folderConfig);
@@ -474,7 +473,7 @@ class Queue {
                 } else {
                     let result = this.list.favorite.songs.includes(config.directory + config.singleTrack)
                     if (result == true) {
-                        this.removeHeart(config.mainEle);
+                        this.removeHeart(config.mainEle, 'track');
                     }
                     return result;
                 }
@@ -487,16 +486,26 @@ class Queue {
         }
     }
 
-    removeHeart(mainEle) {
+    removeHeart(mainEle, type, dataset = undefined) {
         let heartEl = mainEle.querySelector('.myFav');
-        console.log(heartEl);
+        let favElement;
         if (heartEl.classList.contains('addFav') == true) {
-            console.log('---------------')
             heartEl.classList.remove('addFav');
-            let dataset = mainEle.dataset.tracklist;
-            let index = this.list.favorite.songs.indexOf(dataset);
-            this.list.favorite.songs.splice(index, 1);
-            let favElement = this.el.favoriteWrap.querySelector(`[data-tracklist="${dataset}"]`)
+
+            switch (type) {
+                case 'track':
+                    dataset = mainEle.dataset.tracklist;
+                    let index = this.list.favorite.songs.indexOf(dataset);
+                    this.list.favorite.songs.splice(index, 1);
+                    favElement = this.el.favoriteWrap.querySelector(`[data-tracklist="${dataset}"]`)
+                    break;
+
+                case 'album':
+                    delete this.list.favorite.albums[dataset.match(/\/(.*)$/)[1].replace(/-/g, '_')]
+                    favElement = this.el.favoriteWrap.querySelector(`[data-favorite-grp="${dataset}"]`)
+                    break;
+            }
+
             favElement.parentElement.remove();
             this.accordionVisibility()
         }
@@ -518,17 +527,18 @@ class Queue {
                 case 'favorite':
                     let inputValue = config.directory.match(/\/(.*)$/)[1].replace(/-/g, '_');
                     if (inputValue in this.list.favorite.albums) {
-                        let heartEl = config.mainEle.querySelector('.myFav');
-                        if (heartEl.classList.contains('addFav') == true) {
-                            heartEl.classList.remove('addFav');
-                            delete this.list.favorite.albums[inputValue]
-                            let favElement = this.el.favoriteWrap.querySelector(`[data-favorite-grp="${inputValue}"]`)
-                            favElement.parentElement.remove();
-                            this.accordionVisibility()
-                        }
+                        this.removeHeart(config.mainEle, 'album', config.directory)
+                        // let heartEl = config.mainEle.querySelector('.myFav');
+                        // if (heartEl.classList.contains('addFav') == true) {
+                        //     heartEl.classList.remove('addFav');
+                            // delete this.list.favorite.albums[inputValue]
+                            // let favElement = this.el.favoriteWrap.querySelector(`[data-favorite-grp="${inputValue}"]`)
+                            // favElement.parentElement.remove();
+                            // this.accordionVisibility()
+                        // }
                     } else {
                         this.list.favorite.albums[inputValue] = config.tracks;
-                        let nodeWrapper = this.trackNodeWithBackBtn_grp({ inputValue, dataSetType: 'favoriteGrp' })
+                        let nodeWrapper = this.trackNodeWithBackBtn_grp({ inputValue, dataSetType: 'favoriteGrp', datasetValue: config.directory})
                         this.el.favoriteWrap.querySelector('.favoriteAlbums > .mainFavList').appendChild(nodeWrapper);
                         this.accordionVisibility()
 
@@ -764,29 +774,23 @@ class Queue {
 
         // remove on DOM
         let rootMusicEl = wrapperMusicNode.parentElement;
-        console.log(e.path, queueTypeNode)
         // remove on queue
         if (queueTypeNode.classList.contains('defaultWrap') == true) {
-            console.log('defaultWrap')
             let indexPos = this.list.default.indexOf(wrapperMusicNode.dataset.tracklist);
             this.list.default.splice(indexPos, 1);
         } else if (queueTypeNode.classList.contains('favoriteWrap') == true) {
-            console.log('favoriteWrap')
 
             let favoriteTypeNode = this.musicApp.get_target_ancher(e.path, '.favoriteType');
             
             if (favoriteTypeNode.classList.contains('favoriteSongs') == true) {
-                // let indexPos = this.list.favorite.songs.indexOf(wrapperMusicNode.dataset.tracklist);
-                // this.list.favorite.songs.splice(indexPos, 1);
-                let node = this.musicApp.el.container.querySelector('a[data-tracklist="singer/owais-raza-qadri/nabi-ka-jashn-aya.mp3"]')
-                console.log(node)
-                this.removeHeart(node);
-                console.log(this.list);
-
+                let node = this.musicApp.el.container.querySelector(`a[data-tracklist="${wrapperMusicNode.dataset.tracklist}"]`)
+                this.removeHeart(node, 'track');
+            } else if (favoriteTypeNode.classList.contains('favoriteAlbums') == true) {
+                let node = this.musicApp.el.container.querySelector(`a[data-img="${wrapperMusicNode.dataset.favoriteGrp}"]`)
+                this.removeHeart(node, 'album', wrapperMusicNode.dataset.favoriteGrp);
             }
 
         } else if (queueTypeNode.classList.contains('playlistWrap') == true) {
-            console.log('playlistWrap')
             delete this.list.playlist[wrapperMusicNode.dataset.playlistGrp];
             let arr = this.popupInstance.body.querySelectorAll('[data-playlist-name]');
             for (const el of arr) {
