@@ -29,14 +29,10 @@ class PopupJs {
 
         // close popup on blank area and close button
         if (e.target.classList.contains('popup') == true || e.target.classList.contains('closePopup') == true) {
-            console.log(true);
             this.closePopup();
         }
 
         // open popup
-        console.log(e.target.dataset.popup)
-        console.log(e.target.id)
-        console.log(this.id)
         if (e.target.dataset.popup == this.id || e.target.id == this.id) {
             this.opened();
         }

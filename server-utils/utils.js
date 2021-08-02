@@ -15,7 +15,6 @@ const utils = {
             ''
         );
         const pathList = songListStr.split('\\n');
-        console.log(pathList);
         const pathListArr = pathList.map((path) => path.split('/'));
 
         const treeData = {};
@@ -64,7 +63,6 @@ const utils = {
         let data = JSON.parse(JSON.stringify(pathListArr));
         let data2 = JSON.parse(JSON.stringify(pathListArr));
         const ressult = recursion(data, data2, MusicNode, treeData);
-        console.log(ressult);
         return ressult;
     },
 

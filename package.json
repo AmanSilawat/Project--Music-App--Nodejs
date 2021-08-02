@@ -30,7 +30,7 @@
     "fs-js-client": "^1.0.3",
     "pug": "^3.0.0",
     "socket.io": "^3.0.4",
-    "socket.io-stream": "^0.9.1"
+    "socket.io-stream": "^0.5.3"
   },
   "repository": {
     "type": "git",

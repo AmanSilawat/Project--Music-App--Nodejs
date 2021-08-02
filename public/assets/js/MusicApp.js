@@ -238,7 +238,7 @@ class MusicApp {
                     this.audio.dataset.imgSrc = blobImg;
                     this.audio.title = musicName.match(/([\w-]+)\.mp3$/)[1].replace(/-/g, ' ');
                     this.audio.src = `./assets/data/${musicName}`;
-                    this.audio.muted = true;
+                    this.audio.muted = false;
 
                     anchorEle.classList.add('playing');
                     this.musicStateChange()
